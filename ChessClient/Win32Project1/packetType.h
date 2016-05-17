@@ -1,0 +1,17 @@
+#pragma once
+enum
+{
+	
+	CS_RIGHT=1,
+	CS_LEFT,
+	CS_UP,
+	CS_DOWN,
+	CS_LOGIN,
+
+
+	SC_MOVE_POSITION=100,
+	SC_LOGIN_COMPLTE,
+	SC_SET_PLAYER,
+	SC_REMOVE_PLAYER
+
+};
