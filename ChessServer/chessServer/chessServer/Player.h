@@ -1,7 +1,7 @@
 #pragma once
 #define PLAYER_START_POSX 4
 #define PLAYER_START_POSY 4
-#define PLAYER_INCREASE_HP 10
+#define PLAYER_INCREASE_HP 10 //퍼센트 단위
 #define MAX_HEALTH 1000
 
 class Player
@@ -25,7 +25,9 @@ class Player
 public:
 	Player();
 	~Player();
-
+	std::mutex pLock;
+	std::unordered_set<int> pViewList; //플레이어의 정보를 뿌려줄 플레이어리스트
+	std::unordered_set<int> pObjectList; //플레이어 주위의 오브젝트 리스트
 	int viewList[MAX_PLAYER];
 	OverEx* overEx;
 	

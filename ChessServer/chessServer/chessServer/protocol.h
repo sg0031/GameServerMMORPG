@@ -13,6 +13,10 @@
 #define WM_SOCKET WM_USER+1
 
 #define MAX_PLAYER 10
+
+#define STATIC_OBJECT_START 0
+#define DYNAMIC_OBJECT_START 500
+
 struct Removeindex
 {
 	bool Bol;
@@ -24,6 +28,8 @@ struct PlayerPosition
 	int y;
 };
 
+//클라이언트에서 보내는 패킷에서는 아이디값이 필요가 없다
+//이유는 소켓으로 구분짓기 때문에 아이디값으로 구분을 줄 필요가 없다.
 struct CsPacketLogin
 {
 	BYTE packetSize;
@@ -36,6 +42,13 @@ struct CsPacketMove
 	BYTE packetType;
 	int id;
 };
+struct CsPacketAttack //플레이어가 공격버튼을 눌렀을때 보내는 패킷이다.
+{
+	BYTE packetSize;
+	BYTE packetType;
+};
+
+
 struct ScPacketPlayerPosition
 {
 	BYTE pakcetSize;

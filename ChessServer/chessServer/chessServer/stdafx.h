@@ -15,6 +15,8 @@
 #include<WinSock2.h>
 #include<Windows.h>
 #include<time.h>
+#include<mutex>
+#include<unordered_set>
 #include"protocol.h"
 #include"packetType.h"
 #include"Player.h"
