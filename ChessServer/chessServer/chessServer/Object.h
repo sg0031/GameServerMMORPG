@@ -1,6 +1,6 @@
 #pragma once
-#define FIRST_ATTACK 1
-#define PIECE 2
+#define ATTACK_TYPE 1
+#define PIECE_TYPE 2
 
 enum buffType
 {
@@ -12,12 +12,19 @@ enum buffType
 
 class Object
 {
-protected:
+	bool alive;
 	int x;
 	int y;
 public:
-	Object() {};
+	Object() { alive = true; };
 	~Object() {};
+	void setPosX(int x) { this->x = x; }
+	void setPosY(int y) { this->y = y; }
+	int getPosX() { return x; }
+	int getPosY() { return y; }
+	void setAlive(int a) { alive = a; }
+	bool getAlive() { return alive; }
+
 };
 
 //몬스터 클래스틑 오브젝트 클래스를 상속받는다.
@@ -35,6 +42,7 @@ protected:
 	int exp;    //몬스터가 주는 경험치
 	int level;  //몬스터 레벨
 	int gold;   //몬스터가주는 골드
+	int state;  //몬스터의 현재 상태
 public:
 	Monster() {};
 	~Monster() {};

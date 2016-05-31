@@ -1,17 +1,25 @@
 #pragma once
-#define WINDOWSWIDTH 1000
-#define WINDOWSHEIGHT 1000
+#define WINDOWSWIDTH 800
+#define WINDOWSHEIGHT 800
 
 #define WIDTH 100
 #define HEIGHT 100
 
-#define WIDTHRECTANGLE 80
-#define HEIGHTRECTANGLE 80
+#define WIDTHRECTANGLE 8
+#define HEIGHTRECTANGLE 8
+
 
 #define MAXBUFSIZE 256
 #define WM_SOCKET WM_USER+1
 
 #define MAX_PLAYER 10
+#define MAX_MAP_SIZE 2000
+#define DIVDIE_SECTOR 100
+#define MAX_SECTOR_SIZE 20
+
+#define MONSTER_START 2000
+#define OBJECT_START 1000
+
 
 struct PlayerPosition
 {
@@ -57,5 +65,4 @@ struct ScPacketRemovePlayer
 	BYTE packetSize;
 	BYTE packetType;
 	int id;
-	int removeID;
 };

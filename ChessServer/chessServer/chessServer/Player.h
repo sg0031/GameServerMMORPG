@@ -22,6 +22,7 @@ class Player
 	int health; //플레이어 체력
 	int acr; //플레이여 명중률
 	int statusCount; //레벨업시에 남아있는
+	int predSectorX, predSectorY;
 public:
 	Player();
 	~Player();
@@ -31,6 +32,11 @@ public:
 	int viewList[MAX_PLAYER];
 	OverEx* overEx;
 	
+	void setPredSectorX(int sx) { predSectorX = sx; }
+	void setPredSectorY(int sy) { predSectorY = sy; }
+	int getPredSectorX() { return predSectorX; }
+	int getPredSectorY() { return predSectorY; }
+
 	//골드획득시 호출되는 메소드
 	void increaseGold(int gol) { gold += gol; }
 	//레벨업시에 호출되는 메소드

@@ -16,11 +16,14 @@
 #include<Windows.h>
 #include<time.h>
 #include<mutex>
+#include<map>
 #include<unordered_set>
+#include"Object.h"
 #include"protocol.h"
 #include"packetType.h"
 #include"Player.h"
 #include"GameBoard.h"
+#include"Sector.h"
 #include"Server.h"
 
 using namespace std;

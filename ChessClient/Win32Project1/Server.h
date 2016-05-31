@@ -13,8 +13,6 @@ class Server
 	char Complete_buf[MAXBUFSIZE];
 	int in_packet_size;
 	int save_packet_size;
-	
-
 public:
 	Player players[MAX_PLAYER];
 	static Server* getInstangce()

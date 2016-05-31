@@ -1,7 +1,6 @@
 #pragma once
 
-#define MONSTER_START 500
-#define OBJECT_START 100
+
 
 
 enum EOperationType

@@ -49,7 +49,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	s->setSocketHWND(hwnd);
 	s->setHINSTANCE(hInst);
 
-
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
 		TranslateMessage(&msg);
@@ -74,6 +73,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 	static int count;
 	int playerX, playerY, playerEX, playerEY;
 	int x=0, y=0;
+	playerX = 0;
+	playerY = 0;
+	playerEX = 0;
+	playerEY = 0;
 	chessPiece = LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BITMAP1));
 
 	switch (iMsg)
@@ -81,10 +84,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 	case WM_CREATE:
 		x = 0;
 		y = 0;
-		playerX = 0;
-		playerY = 0;
-		playerEX = 0;
-		playerEY = 0;
+
 		count = 0;
 		SetTimer(hwnd, 1, 200,NULL);
 		ZeroMemory(&ip, sizeof(ip));

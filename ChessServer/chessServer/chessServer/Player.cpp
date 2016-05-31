@@ -8,8 +8,6 @@ Player::Player()
 	id = -1;
 	x = PLAYER_START_POSX;
 	y = PLAYER_START_POSY;
-
-
 	attack=100; // 플레이어 공격력
 	depend=10; //플레이어 방어력
 	miss=10;//플레이어 회피력
@@ -23,6 +21,8 @@ Player::Player()
 	acr=10; //플레이여 명중률
 	statusCount=0; //레벨업시에 남아있는
 
+	pViewList.clear();
+	pObjectList.clear();
 
 	overEx = new OverEx;
 	ZeroMemory(&overEx->iocpBuf, sizeof(overEx->iocpBuf));

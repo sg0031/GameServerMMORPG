@@ -13,9 +13,13 @@
 #define WM_SOCKET WM_USER+1
 
 #define MAX_PLAYER 10
+#define MAX_MAP_SIZE 2000
+#define DIVDIE_SECTOR 100
+#define MAX_SECTOR_SIZE 20
 
-#define STATIC_OBJECT_START 0
-#define DYNAMIC_OBJECT_START 500
+#define MONSTER_START 2000
+#define OBJECT_START 1000
+
 
 struct Removeindex
 {
@@ -75,5 +79,4 @@ struct ScPacketRemovePlayer
 	BYTE packetSize;
 	BYTE packetType;
 	int id;
-	int removeID;
 };
