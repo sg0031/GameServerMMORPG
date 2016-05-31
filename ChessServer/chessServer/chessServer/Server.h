@@ -9,7 +9,7 @@ class Server
 	static std::map<int, Player> players;
 	static std::map<int, Object*> objects;
 	static Sector gameMap[MAX_SECTOR_SIZE][MAX_SECTOR_SIZE];
-
+	static TimerThread timer;
 public:
 	Server();
 	~Server();

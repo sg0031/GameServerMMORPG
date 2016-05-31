@@ -9,6 +9,8 @@ std::map<int, Player> Server::players;
 std::map<int, Object*> Server::objects;
 Sector Server::gameMap[MAX_SECTOR_SIZE][MAX_SECTOR_SIZE];
 int Server::count = 0;
+TimerThread Server::timer;
+HandleManager *hManger = HandleManager::getInstance();
 
 Server::Server()
 {
@@ -22,7 +24,7 @@ Server::Server()
 
 	vector<thread*> worker;
 
-	io = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, 0);
+	hManger->gHandle = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, 0);
 
 	for (auto i = 0; i < (int)is.dwNumberOfProcessors; ++i)
 	{
@@ -30,6 +32,7 @@ Server::Server()
 	}
 
 	auto Acceptex = thread{ acceptThread };
+	auto timerEx = thread{ &TimerThread::eventTimerThread,&timer };
 
 	while (1)
 	{
@@ -37,6 +40,7 @@ Server::Server()
 	}
 
 	Acceptex.join();
+	timerEx.join();
 
 	for (auto t : worker)
 	{
@@ -91,7 +95,7 @@ void Server::acceptThread()
 			cout << "Client Socket Error" << endl;
 	
 		players[count].overEx->s = clientSock;
-		CreateIoCompletionPort((HANDLE)clientSock, io, count, 0);
+		CreateIoCompletionPort((HANDLE)clientSock, hManger->gHandle, count, 0);
 		//	cout << id << "¸í Á¢¼Ó" << endl;
 
 		unsigned long recvflag = 0;
@@ -125,7 +129,7 @@ void Server::workerThread()
 
 	while (1)
 	{
-		GetQueuedCompletionStatus(io, &ioSize, &objectId,
+		GetQueuedCompletionStatus(hManger->gHandle, &ioSize, &objectId,
 			reinterpret_cast<LPOVERLAPPED *>(&over), INFINITE);
 
 		if (ioSize == 0)
