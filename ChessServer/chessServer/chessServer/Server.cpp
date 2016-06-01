@@ -136,6 +136,8 @@ void Server::workerThread()
 		{
 			//cout << iosize << endl;
 			closesocket(over->s);
+			players.erase(static_cast<int>(objectId)); //플레이어가 게임에서 나갔을때 리스트에서 지워줘야 한다.
+
 			//WSAGetOverlappedResult
 			//게임종료 처리
 		}
@@ -201,11 +203,16 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 	{
 		cout << "Login Accept" << endl;
 		players[id].setID(id);
-		cout << "id : " << players[id].getID() << endl;
-		players[id].setPlay(true);
+		cout << "id : " << players[id].getID() << endl;	
 		//로그인시에 현재좌표를 기준으로 섹터의 위치를 기록한다.
-		players[id].setPredSectorX(players[id].getPositionX() / DIVDIE_SECTOR);
-		players[id].setPredSectorY(players[id].getPositionY() / DIVDIE_SECTOR);
+		int x = players[id].getPositionX() / DIVDIE_SECTOR;
+		int y = players[id].getPositionY() / DIVDIE_SECTOR;
+		gameMap[x][y].sLock.lock();
+		gameMap[x][y].player.insert(id);
+		gameMap[x][y].sLock.unlock();
+
+		players[id].setPredSectorX(x);
+		players[id].setPredSectorY(y);
 
 		updateSector(id);
 		viewListUpdate(id);
@@ -218,6 +225,7 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		login.position.y = players[id].getPositionY();
 		sendPacket(id, &login);
 
+		players[id].setPlay(true);
 		break;
 	}
 	case CS_RIGHT:
@@ -284,6 +292,9 @@ void Server::updateSector(int id)
 
 	if (currX != predX || currY != predY) //이전섹터와 같지 않으면
 	{
+		std::cout << "변경" << std::endl;
+		players[id].setPredSectorX(currX);
+		players[id].setPredSectorY(currY);
 		gameMap[currX][currY].sLock.lock();
 		if (0 == gameMap[currX][currY].player.count(id))
 		{
@@ -369,6 +380,21 @@ void Server::viewListUpdate(int id)
 			else players[id].pLock.unlock();
 		}
 	}
+
+	//다른플레이어 리스트에 자신이 있나 확인해야 한다.
+	//이 작업은 플레이어들에 한해서 해야한다.
+	for (auto i : nearList)
+	{
+		if (i < OBJECT_START) {
+			players[i].pLock.lock();
+			if (0 == players[i].pViewList.count(id))
+			{
+				players[i].pViewList.insert(id);
+				players[i].pLock.unlock();
+			}
+			else players[i].pLock.unlock();
+		}
+	}
 	//현재 nearlist에 없는데 뷰리스트에 존재하는 아이디들을 리무브 리스트로 옴겨준다.
 	for (auto i : players[id].pViewList)
 	{
@@ -416,6 +442,21 @@ void Server::viewListUpdate(int id)
 		}
 	}
 
+	for (auto i : nearList)
+	{
+		if (i >= OBJECT_START)
+		{
+			continue;
+		}
+		else
+		{
+			put.id = id;
+			put.position.x = players[i].getPositionX();
+			put.position.y = players[i].getPositionY();
+			sendPacket(i, &put);
+		}
+	}
+
 	ScPacketRemovePlayer remove;
 	remove.packetSize = sizeof(ScPacketRemovePlayer);
 	remove.packetType = SC_REMOVE_PLAYER;
@@ -430,6 +471,19 @@ void Server::viewListUpdate(int id)
 		{
 			remove.id = i;
 			sendPacket(id, &put);
+		}
+	}
+
+	for (auto i : removeList)
+	{
+		if (i >= OBJECT_START)
+		{
+			continue;
+		}
+		else
+		{
+			remove.id = id;
+			sendPacket(i, &put);
 		}
 	}
 }

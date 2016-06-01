@@ -92,7 +92,7 @@ void Server::ReadPacket()
 		int err_code = WSAGetLastError();
 		cout << "Recv Error : " << err_code << endl;
 	}
-	cout << "recv" << endl;
+	//cout << "recv" << endl;
 	char *ptr = reinterpret_cast<char*>(Recv_buf);
 
 	while (0 != iobyte)
@@ -194,7 +194,7 @@ void Server::ProcessPacket(char* buf)
 	{
 		ScPacketPutPlayer *position =
 			reinterpret_cast<ScPacketPutPlayer*>(buf);
-
+		//cout << "set : " << position->position.x<<","<<position->position.y<< endl;
 		for (auto i = 1; i < MAX_PLAYER; ++i)
 		{
 			if (-1 == players[i].getID())
@@ -216,9 +216,9 @@ void Server::ProcessPacket(char* buf)
 	}
 	case SC_MOVE_POSITION:
 	{
-		cout << "pos" << endl;
 		ScPacketMove *pos =
 			reinterpret_cast<ScPacketMove*>(buf);
+		cout << "pos : " << pos->position.x <<pos->position.y<< endl;
 		for (int i = 0; i < MAX_PLAYER; ++i)
 		{
 			if (pos->id == players[i].getID())
@@ -232,6 +232,7 @@ void Server::ProcessPacket(char* buf)
 	}
 	case SC_REMOVE_PLAYER:
 	{
+		cout << "remove" << endl;
 		ScPacketRemovePlayer *remove=reinterpret_cast<ScPacketRemovePlayer*>(buf);
 		for (auto i = 0; i < MAX_PLAYER; ++i)
 		{
@@ -239,6 +240,7 @@ void Server::ProcessPacket(char* buf)
 			{
 				players[i].setPositionX(-10);
 				players[i].setPositionY(-10);
+				break;
 			}
 		}
 		break;

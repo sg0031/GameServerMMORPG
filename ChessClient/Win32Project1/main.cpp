@@ -123,8 +123,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 	case WM_PAINT:
 		hdc = BeginPaint(hwnd, &ps);
 		wsprintf(pos, "player pos[ %d, %d ]", s->players[0].getPositionX(), s->players[0].getPositionY());
-		TextOut(hdc, 10, 900, ip, sizeof(ip));
-		TextOut(hdc, 10, 920, pos, sizeof(pos));
+		TextOut(hdc, 10, 700, ip, sizeof(ip));
+		TextOut(hdc, 10, 720, pos, sizeof(pos));
 		for (int i = playerX; i < playerEX; ++i)
 		{
 			for (int j = playerY; j < playerEY; ++j)
