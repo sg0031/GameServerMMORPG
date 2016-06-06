@@ -18,7 +18,7 @@ void TimerThread::eventTimerThread()
 	std::cout << "timer create" << std::endl;
 	while (1)
 	{
-		Sleep(0);
+		Sleep(1);
 		TimerLock.lock();
 		if (0 == timerQueue.size())
 		{

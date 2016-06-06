@@ -30,7 +30,5 @@ public:
 	void KeyDown(WPARAM wParam);
 	void ProcessPacket(char* buf);
 	void SendPacket(SOCKET s, void* buf);
-
-
 };
 

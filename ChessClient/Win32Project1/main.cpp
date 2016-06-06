@@ -11,7 +11,23 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 	WPARAM wParam, LPARAM lParam);
 HINSTANCE hInst;
 HWND hWnd;
+RECT crt;
+HBITMAP  bBitmap;
+int globalX;
+int globalY;
 Server *s = Server::getInstangce();
+
+void drawObject(HDC hdc, HBITMAP image,int posx,int posy)
+{
+	HDC MemDC;
+	HBITMAP OldBitmap;
+	MemDC = CreateCompatibleDC(hdc);
+	OldBitmap = (HBITMAP)SelectObject(MemDC, image);
+	TransparentBlt(hdc, posx, posy,
+		WIDTHRECTANGLE, HEIGHTRECTANGLE, MemDC, 0, 0, 35, 62, RGB(255, 255, 255));
+	SelectObject(MemDC, OldBitmap);
+	DeleteDC(MemDC);
+}
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	LPSTR lpszCmdLine, int nCmdShow)
@@ -49,12 +65,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	s->setSocketHWND(hwnd);
 	s->setHINSTANCE(hInst);
 
-	while (GetMessage(&msg, NULL, 0, 0))
+	while (GetMessage(&msg, 0, 0, 0))
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
-	return (int)msg.wParam;
+	return msg.wParam;
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
@@ -63,30 +79,39 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 	HWND hDlg = NULL;
 	hWnd = hDlg;
 	HDC hdc;
-	HDC memdc;
+	static HDC bMemdc1,bMemdc2;
 	PAINTSTRUCT ps;
 	HBRUSH hBrush, oldBrush;
 	HBRUSH hBrushBlack, oldBrushBlack;
-	HBITMAP chessPiece;
+	static HBITMAP chessPiece,skyMap,oldBit1,oldBit2,oldBit3;
 	static char ip[10];
 	static char pos[20];
 	static int count;
-	int playerX, playerY, playerEX, playerEY;
-	int x=0, y=0;
-	playerX = 0;
-	playerY = 0;
-	playerEX = 0;
-	playerEY = 0;
-	chessPiece = LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BITMAP1));
-
+	//chessPiece = LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BITMAP1));
+	//skyMap= LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BITMAP2));
 	switch (iMsg)
 	{
+	case WM_SOCKET:
+	{
+		if (WSAGETSELECTERROR(lParam)) {
+			closesocket((SOCKET)wParam);
+			break;
+		}
+		switch (WSAGETSELECTEVENT(lParam)) {
+		case FD_READ:
+			s->ReadPacket();
+			//	InvalidateRect(hWnd, NULL, TRUE);
+			break;
+		case FD_CLOSE:
+			closesocket((SOCKET)wParam);
+			break;
+		}
+	}
+	break;
 	case WM_CREATE:
-		x = 0;
-		y = 0;
-
+		GetClientRect(hwnd, &crt);
 		count = 0;
-		SetTimer(hwnd, 1, 200,NULL);
+		SetTimer(hwnd, 1, 100,NULL);
 		ZeroMemory(&ip, sizeof(ip));
 		break;
 	case WM_CHAR:
@@ -107,89 +132,64 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		s->KeyDown(wParam);
 		break;
 	case WM_TIMER:
-		playerX = s->players[0].getPositionX() - 5;
-		playerY = s->players[0].getPositionY() - 5;
-		playerEX = s->players[0].getPositionX() + 5;
-		playerEY = s->players[0].getPositionY() + 5;
-		if (playerX < 0)
-			playerX = 0;
-		if (playerY < 0)
-			playerY = 0;
-		if (playerEX > 100)
-			playerEX = 100;
-		if (playerEY > 100)
-			playerEY = 100;
-		InvalidateRect(hWnd, NULL, false);
+		//더블버퍼링---------------------------------
+		//hdc = GetDC(hwnd);
+		//if (bBitmap == NULL)
+		//	bBitmap = CreateCompatibleBitmap(hdc, 600, 600);
+		//bMemdc1 = CreateCompatibleDC(hdc);
+		//bMemdc2 = CreateCompatibleDC(bMemdc1);
+		//oldBit1 = (HBITMAP)SelectObject(bMemdc1, bBitmap); // mem1dc에는 hBit1
+		//oldBit2 = (HBITMAP)SelectObject(bMemdc2, skyMap); // mem2dc에는 hBit2
+		//BitBlt(bMemdc1, 0, 0, 600, 600, bMemdc2, 0, 0, SRCCOPY);
+
+		//wsprintf(pos, "player pos[ %d, %d ]", s->players[0].getPositionX(), s->players[0].getPositionY());
+		//TextOut(hdc, 10, 660, ip, sizeof(ip));
+		//TextOut(hdc, 10, 680, pos, sizeof(pos));
+		////oldBit3 = (HBITMAP)SelectObject(bMemdc2, chessPiece);
+		//
+		////SetBkMode(bMemdc1, TRANSPARENT);
+		//for (int p = 0; p < MAX_PLAYER; ++p)
+		//{
+		//	if (true==s->players[p].getConnect())
+		//	{
+		//		drawObject(bMemdc1, chessPiece,s->players[p].getPositionX(),s->players[p].getPositionY());
+		//	}
+		//}
+		//
+		////SelectObject(bMemdc2, oldBit3); DeleteDC(bMemdc2);
+		//SelectObject(bMemdc2, oldBit2); DeleteDC(bMemdc2);
+		//SelectObject(bMemdc1, oldBit1); DeleteDC(bMemdc1);
+		//ReleaseDC(hwnd, hdc);
+		//InvalidateRect(hwnd, NULL, false);
+		InvalidateRect(hwnd, NULL, true);
+		break;
 	case WM_PAINT:
+		globalX = 300;
+		globalY = 300;
 		hdc = BeginPaint(hwnd, &ps);
-		wsprintf(pos, "player pos[ %d, %d ]", s->players[0].getPositionX(), s->players[0].getPositionY());
-		TextOut(hdc, 10, 700, ip, sizeof(ip));
-		TextOut(hdc, 10, 720, pos, sizeof(pos));
-		for (int i = playerX; i < playerEX; ++i)
+		for (int p = 0; p < MAX_PLAYER; ++p)
 		{
-			for (int j = playerY; j < playerEY; ++j)
+			if (true==s->players[p].getConnect())
 			{
-				if (s->board[i][j].getType() == 1)
-				{
-					hBrushBlack = CreateSolidBrush(RGB(0, 255, 128));
-					oldBrushBlack = (HBRUSH)SelectObject(hdc, hBrushBlack);
-					Rectangle(hdc,
-						x,
-						y,
-						x + WIDTHRECTANGLE,
-						y + HEIGHTRECTANGLE);
-					SelectObject(hdc, oldBrushBlack);
-					DeleteObject(hBrushBlack);
-				}
+				if(p==s->players[0].getID())
+					Rectangle(hdc, globalX, globalY, globalX + 40, globalY + 40);
 				else
-				{
-					hBrush = CreateSolidBrush(RGB(255, 255, 255));
-					oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
-					Rectangle(hdc,
-						x,
-						y,
-						x + WIDTHRECTANGLE,
-						y + HEIGHTRECTANGLE);
-					SelectObject(hdc, oldBrush);
-					DeleteObject(hBrush);
-				}
-				
-				for (int p = 0; p < MAX_PLAYER; ++p)
-				{
-					if (s->players[p].getPositionX() == i && s->players[p].getPositionY() == j)
-					{
-						memdc = CreateCompatibleDC(hdc);
-						(HBITMAP)SelectObject(memdc, chessPiece);
-						TransparentBlt(hdc, x, y,
-							WIDTHRECTANGLE, HEIGHTRECTANGLE, memdc, 0, 0, 35, 62, RGB(255, 255, 255));
-						DeleteDC(memdc);
-					}
-				}
-				x += WIDTHRECTANGLE;
+					Rectangle(hdc, s->players[p].getPositionX() , s->players[p].getPositionY(),
+						s->players[p].getPositionX()+40, s->players[p].getPositionY()+40);
 			}
-			y += HEIGHTRECTANGLE;
-			x = 0;
 		}
-		y = 0;
+		//--------------더블버퍼링-------------------------
+		//bMemdc1 = CreateCompatibleDC(hdc);
+		//// hBit1에는 배경과 텍스트가 출력된 비트맵이 저장, mem1dc에 설정
+		//oldBit1 = (HBITMAP)SelectObject(bMemdc1, bBitmap);
+		//// mem1dc에 있는 내용을 hdc에 뿌려준다.
+		//BitBlt(hdc, 0, 0,600,600, bMemdc1, 0, 0, SRCCOPY);
+
+		//SelectObject(bMemdc1, oldBit1);
+		//DeleteDC(bMemdc2);
 		EndPaint(hwnd, &ps);
 		break;
-	case WM_SOCKET:
-	{
-		if (WSAGETSELECTERROR(lParam)) {
-			closesocket((SOCKET)wParam);
-			break;
-		}
-		switch (WSAGETSELECTEVENT(lParam)) {
-		case FD_READ:
-			s->ReadPacket();
-			//	InvalidateRect(hWnd, NULL, TRUE);
-			break;
-		case FD_CLOSE:
-			closesocket((SOCKET)wParam);
-			break;
-		}
-	}
-	break;
+
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;

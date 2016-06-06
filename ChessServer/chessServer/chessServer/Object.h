@@ -12,19 +12,18 @@ enum buffType
 
 class Object
 {
-	bool alive;
+	bool active;
 	int x;
 	int y;
 public:
-	Object() { alive = true; };
+	Object() { active = true; };
 	~Object() {};
 	void setPosX(int x) { this->x = x; }
 	void setPosY(int y) { this->y = y; }
 	int getPosX() { return x; }
 	int getPosY() { return y; }
-	void setAlive(int a) { alive = a; }
-	bool getAlive() { return alive; }
-
+	void setActive(int a) { active = a; }
+	bool getActive() { return active; }
 };
 
 //몬스터 클래스틑 오브젝트 클래스를 상속받는다.

@@ -1,4 +1,20 @@
 #pragma once
+enum EOperationType
+{
+	Sendtype = 1,
+	Recvtype = 2
+};
+struct OverEx	//오버렙트구조체 확장
+{
+	OVERLAPPED overLapped;
+	SOCKET s;
+	EOperationType operationType;	//패킷의 타입
+	int prevSize;	//이전데이타 크기
+	int currentSize;//현재데이타 크기
+	WSABUF buf;
+	char packetBuf[256];
+	char iocpBuf[4096];
+};
 enum
 {
 	

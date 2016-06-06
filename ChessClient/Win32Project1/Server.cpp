@@ -135,44 +135,31 @@ void Server::KeyDown(WPARAM wParam)
 	if (wParam == VK_LEFT) x -= 1;
 	if (wParam == VK_RIGHT) x += 1;
 
-	CsPacketMove *movePacket = reinterpret_cast<CsPacketMove*>(Send_buf);
-	movePacket->packetSize = sizeof(movePacket);
-	WSA_send_buf.len = sizeof(movePacket);
+	CsPacketMove movePacket;
+	movePacket.packetSize = sizeof(CsPacketMove);
 	if (0 != x)
 	{
 		if (x == 1)
 		{
-			movePacket->packetType = CS_RIGHT;
+			movePacket.packetType = CS_RIGHT;
 		}
 		else
 		{
-			movePacket->packetType = CS_LEFT;
-		}
-		retval = WSASend(sock, &WSA_send_buf, 1, &iobyte, ioflag, NULL, NULL);
-		//cout << iobyte << endl;
-		if (retval == SOCKET_ERROR)
-		{
-			cout << "WSASend() x Error" << endl;
-			cout << WSAGetLastError() << endl;
+			movePacket.packetType = CS_LEFT;
 		}
 	}
 	if (0 != y)
 	{
 		if (y == 1)
 		{
-			movePacket->packetType = CS_UP;
+			movePacket.packetType = CS_UP;
 		}
 		else
 		{
-			movePacket->packetType = CS_DOWN;
-		}
-		retval = WSASend(sock, &WSA_send_buf, 1, &iobyte, ioflag, NULL, NULL);
-		if (retval == SOCKET_ERROR)
-		{
-			cout << "WSASend() x Error" << endl;
-			cout << WSAGetLastError() << endl;
+			movePacket.packetType = CS_DOWN;
 		}
 	}
+	SendPacket(sock, &movePacket);
 }
 void Server::ProcessPacket(char* buf)
 {
@@ -186,7 +173,7 @@ void Server::ProcessPacket(char* buf)
 		players[0].setID(p->id);
 		players[0].setPositionX(p->position.x);
 		players[0].setPositionY(p->position.y);
-
+		players[0].setConnect(true);
 		cout << "my_id : " << p->id << endl;
 		break;
 	}
@@ -202,6 +189,7 @@ void Server::ProcessPacket(char* buf)
 				players[i].setID(position->id);
 				players[i].setPositionX(position->position.x);
 				players[i].setPositionY(position->position.y);
+				players[i].setConnect(true);
 				break;
 			}
 			else if (position->id == players[i].getID())
@@ -209,6 +197,7 @@ void Server::ProcessPacket(char* buf)
 				players[i].setID(position->id);
 				players[i].setPositionX(position->position.x);
 				players[i].setPositionY(position->position.y);
+				players[i].setConnect(true);
 				break;
 			}
 		}
@@ -218,7 +207,7 @@ void Server::ProcessPacket(char* buf)
 	{
 		ScPacketMove *pos =
 			reinterpret_cast<ScPacketMove*>(buf);
-		cout << "pos : " << pos->position.x <<pos->position.y<< endl;
+		//cout << "pos : " << pos->position.x <<","<<pos->position.y<< endl;
 		for (int i = 0; i < MAX_PLAYER; ++i)
 		{
 			if (pos->id == players[i].getID())
@@ -240,6 +229,7 @@ void Server::ProcessPacket(char* buf)
 			{
 				players[i].setPositionX(-10);
 				players[i].setPositionY(-10);
+				players[i].setConnect(false);
 				break;
 			}
 		}
@@ -249,12 +239,28 @@ void Server::ProcessPacket(char* buf)
 }
 void Server::SendPacket(SOCKET s, void* buf)
 {
-	SOCKET Send_socket = s;
-	int packet_size = reinterpret_cast<char*>(buf)[0];
-	memcpy(Complete_buf, buf, packet_size);
-
-	WSA_Complete_buf.buf = Complete_buf;
-	WSA_Complete_buf.len = packet_size;
 	DWORD iobyte;
-	WSASend(Send_socket, &WSA_Complete_buf, 1, &iobyte, 0, NULL, NULL);
+	DWORD ioflag = 0;
+	SOCKET Send_socket = s;
+	int packet_size = reinterpret_cast<unsigned char*>(buf)[0];
+	OverEx *Send_Operation = new OverEx;
+	ZeroMemory(Send_Operation, sizeof(OverEx));
+
+	Send_Operation->buf.buf = Send_Operation->packetBuf;
+	Send_Operation->buf.len = packet_size;
+
+	//wsaCompleteBuf.buf = completeBuf;
+	//wsaCompleteBuf.len = packet_size;
+
+	memcpy(Send_Operation->packetBuf, reinterpret_cast<char*>(buf), packet_size);
+
+	int retval = WSASend(Send_socket, &Send_Operation->buf, 1, &iobyte, ioflag, NULL, NULL);
+	//cout << iobyte << endl;
+	if (retval == SOCKET_ERROR)
+	{
+		cout << "WSASend() x Error" << endl;
+		cout << WSAGetLastError() << endl;
+	}
+	delete Send_Operation;
+	//cout << "client data send" << endl;
 }

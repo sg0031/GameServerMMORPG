@@ -203,7 +203,8 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 	{
 		cout << "Login Accept" << endl;
 		players[id].setID(id);
-		cout << "id : " << players[id].getID() << endl;	
+		cout << "id : " << players[id].getID() << endl;
+		players[id].setPlay(true);
 		//로그인시에 현재좌표를 기준으로 섹터의 위치를 기록한다.
 		int x = players[id].getPositionX() / DIVDIE_SECTOR;
 		int y = players[id].getPositionY() / DIVDIE_SECTOR;
@@ -214,9 +215,6 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		players[id].setPredSectorX(x);
 		players[id].setPredSectorY(y);
 
-		updateSector(id);
-		viewListUpdate(id);
-
 		ScPacketPlayerPosition login;
 		login.pakcetSize = sizeof(ScPacketPlayerPosition);
 		login.packetType = SC_LOGIN_COMPLTE;
@@ -225,31 +223,23 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		login.position.y = players[id].getPositionY();
 		sendPacket(id, &login);
 
-		players[id].setPlay(true);
+		updateSector(id);
+		viewListUpdate(id);
+
 		break;
 	}
 	case CS_RIGHT:
 	{
-	//	cout << "Right" << endl;
+		//	cout << "Right" << endl;
 		CsPacketMove *movePacket = reinterpret_cast<CsPacketMove*>(ptr);
-		int y = players[id].getPositionY();
-		if (y + 1 > MAX_MAP_SIZE)
-			y = MAX_MAP_SIZE;
-		else y++;
-		players[id].setPositionY(y);
+		int x = players[id].getPositionX();
+		if (x + 1 > MAX_MAP_SIZE)
+			x = MAX_MAP_SIZE;
+		else x++;
+		players[id].setPositionX(x);
 		break;
 	}
 	case CS_LEFT:
-	{
-		CsPacketMove *movePacket = reinterpret_cast<CsPacketMove*>(ptr);
-		int y = players[id].getPositionY();
-		if (y - 1 < 0)
-			y = 0;
-		else y--;
-		players[id].setPositionY(y);
-		break;
-	}
-	case CS_UP:
 	{
 		CsPacketMove *movePacket = reinterpret_cast<CsPacketMove*>(ptr);
 		int x = players[id].getPositionX();
@@ -259,14 +249,24 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		players[id].setPositionX(x);
 		break;
 	}
+	case CS_UP:
+	{
+		CsPacketMove *movePacket = reinterpret_cast<CsPacketMove*>(ptr);
+		int y = players[id].getPositionY();
+		if (y - 1 < 0)
+			y = 0;
+		else y--;
+		players[id].setPositionY(y);
+		break;
+	}
 	case CS_DOWN:
 	{
 		CsPacketMove *movePacket = reinterpret_cast<CsPacketMove*>(ptr);
-		int x = players[id].getPositionX();
-		if (x + 1 > MAX_MAP_SIZE)
-			x = MAX_MAP_SIZE;
-		else x++;
-		players[id].setPositionX(x);
+		int y = players[id].getPositionY();
+		if (y + 1 > MAX_MAP_SIZE)
+			y = MAX_MAP_SIZE;
+		else y++;
+		players[id].setPositionY(y);
 		break;
 	}
 
@@ -282,6 +282,11 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 
 	updateSector(id);
 	viewListUpdate(id);
+
+	players[id].pLock.lock();
+	for (auto i : players[id].pViewList)
+		sendPacket(i, &packet);
+	players[id].pLock.unlock();
 }
 void Server::updateSector(int id)
 {
@@ -290,9 +295,9 @@ void Server::updateSector(int id)
 	int predX = players[id].getPredSectorX();
 	int predY = players[id].getPredSectorY();
 
-	if (currX != predX || currY != predY) //이전섹터와 같지 않으면
+	if ((currX != predX) || (currY != predY)) //이전섹터와 같지 않으면
 	{
-		std::cout << "변경" << std::endl;
+		//std::cout << "변경" << std::endl;
 		players[id].setPredSectorX(currX);
 		players[id].setPredSectorY(currY);
 		gameMap[currX][currY].sLock.lock();
@@ -318,25 +323,25 @@ void Server::viewListUpdate(int id)
 	std::unordered_set<int> removeList;
 	int startSectorX, startSectorY, endSectorX, endSectorY;
 
-	startSectorX = players[id].getPositionX() / DIVDIE_SECTOR;
-	startSectorY = players[id].getPositionY() / DIVDIE_SECTOR;
-	endSectorX = players[id].getPositionX() / DIVDIE_SECTOR;
-	endSectorY = players[id].getPositionY() / DIVDIE_SECTOR;
+	startSectorX = (players[id].getPositionX() / DIVDIE_SECTOR)-1;
+	startSectorY = (players[id].getPositionY() / DIVDIE_SECTOR)-1;
+	endSectorX = (players[id].getPositionX() / DIVDIE_SECTOR)+1;
+	endSectorY = (players[id].getPositionY() / DIVDIE_SECTOR)+1;
 
-	if (startSectorX - 1 < 0)
+	if (startSectorX < 0)
 		startSectorX = 0;
-	if (startSectorY - 1 < 0)
+	if (startSectorY < 0)
 		startSectorY = 0;
-	if (endSectorX + 1 > MAX_SECTOR_SIZE)
+	if (endSectorX > MAX_SECTOR_SIZE)
 		endSectorX = MAX_SECTOR_SIZE;
-	if (endSectorY + 1 > MAX_SECTOR_SIZE)
+	if (endSectorY > MAX_SECTOR_SIZE)
 		endSectorY = MAX_SECTOR_SIZE;
 	//시야주변 섹터를 돌면서 현재 위치를 바탕으로 검사를 진행한다.
 	for (auto i = startSectorX; i <= endSectorX; i++)
 	{
 		for (auto j = startSectorY; j <= endSectorY; ++j)
 		{
-			if (0 == gameMap[i][j].player.size() && 0 == gameMap[i][j].object.size()) continue; //섹터에 플레이어나 오브젝트가 없을경우는 건너뛴다.
+			if ((0 == gameMap[i][j].player.size()) && (0 == gameMap[i][j].object.size())) continue; //섹터에 플레이어나 오브젝트가 없을경우는 건너뛴다.
 			gameMap[i][j].sLock.lock();
 			for (auto p : gameMap[i][j].player) //플레이어에 대한
 			{
@@ -349,7 +354,7 @@ void Server::viewListUpdate(int id)
 			gameMap[i][j].sLock.lock();
 			for (auto m : gameMap[i][j].object) //오브젝트에 대한
 			{
-				if (false == objects[m]->getAlive()) continue; //오브젝트들의 존재여부 판단.
+				//if (false == objects[m]->getActive()) continue;
 				nearList.insert(m);
 			}
 			gameMap[i][j].sLock.unlock();
@@ -359,17 +364,22 @@ void Server::viewListUpdate(int id)
 	//존재하면 그냥 넘어가고 존재하지 않으면 뷰리스트에 추가를 해 준다.
 	for (auto i : nearList)
 	{
-		if (i >= OBJECT_START)
+		if (i >= OBJECT_START)	//오브젝트일 경우
 		{
 			players[id].pLock.lock();
 			if (0==players[id].pObjectList.count(i))
 			{
 				players[id].pObjectList.insert(i);
+				objects[i]->setActive(true); //플레이어의 시야에 들어왔기떄문에 오브젝트를 활동상태로 바꿔줘야한다.
 				players[id].pLock.unlock();	
 			}
-			else players[id].pLock.unlock();
+			else
+			{
+				players[id].pLock.unlock();
+				continue;
+			}
 		}
-		if (i < OBJECT_START)
+		if (i < OBJECT_START)	//플레이어일 경우
 		{
 			players[id].pLock.lock();
 			if (0 == players[id].pViewList.count(i))
@@ -377,10 +387,13 @@ void Server::viewListUpdate(int id)
 				players[id].pViewList.insert(i);
 				players[id].pLock.unlock();
 			}
-			else players[id].pLock.unlock();
+			else
+			{
+				players[id].pLock.unlock();
+				continue;
+			}
 		}
 	}
-
 	//다른플레이어 리스트에 자신이 있나 확인해야 한다.
 	//이 작업은 플레이어들에 한해서 해야한다.
 	for (auto i : nearList)
@@ -392,33 +405,48 @@ void Server::viewListUpdate(int id)
 				players[i].pViewList.insert(id);
 				players[i].pLock.unlock();
 			}
-			else players[i].pLock.unlock();
+			else
+			{
+				players[i].pLock.unlock();
+				continue;
+			}
 		}
 	}
 	//현재 nearlist에 없는데 뷰리스트에 존재하는 아이디들을 리무브 리스트로 옴겨준다.
+	players[id].pLock.lock();
 	for (auto i : players[id].pViewList)
 	{
-		players[id].pLock.lock();
-		if (0 == nearList.count(i))
-		{
-			players[id].pViewList.erase(i);
-			players[id].pLock.unlock();
-			removeList.insert(i);
-		}
-		else players[id].pLock.unlock();
+		if (0 != nearList.count(i))	continue;
+		removeList.insert(i);
 	}
 	for (auto i : players[id].pObjectList)
 	{
-		players[id].pLock.lock();
-		if (0 == nearList.count(i))
+		if (0 != nearList.count(i)) continue;
+		removeList.insert(i);
+	}
+
+	for (auto i : removeList)
+	{
+		if (i >= OBJECT_START)
 		{
 			players[id].pObjectList.erase(i);
-			objects[i]->setAlive(false); //플레이어의 시야에서 오브젝트가 사라졌을때 false로 바꿔준다.
-			players[id].pLock.unlock();
-			removeList.insert(i);
 		}
-		else players[id].pLock.unlock();
+		else
+			players[id].pViewList.erase(i);
 	}
+	players[id].pLock.unlock();
+
+
+	for (auto i : removeList) {
+		if (i>=OBJECT_START) continue;
+		players[i].pLock.lock();
+		if (0 != players[i].pViewList.count(id)) {
+			players[i].pViewList.erase(id);
+			players[i].pLock.unlock();
+		}
+		else 	players[i].pLock.unlock();
+	}
+
 
 	//nearlist에 있는 대상들을 뿌려준다.
 	ScPacketPutPlayer put;
@@ -426,14 +454,14 @@ void Server::viewListUpdate(int id)
 	put.packetType = SC_SET_PLAYER;
 	for (auto i : nearList)
 	{
-		if (i >= OBJECT_START)
+		if (i >= OBJECT_START)	//오브젝트의 경우
 		{
 			put.id = i;
 			put.position.x = objects[i]->getPosX();
 			put.position.y = objects[i]->getPosY();
 			sendPacket(id, &put);
 		}
-		else
+		else				//플레이어의 경우
 		{
 			put.id = i;
 			put.position.x = players[i].getPositionX();
@@ -446,7 +474,7 @@ void Server::viewListUpdate(int id)
 	{
 		if (i >= OBJECT_START)
 		{
-			continue;
+			continue;	//몬스터의 경우는 지나간다.
 		}
 		else
 		{
@@ -457,35 +485,7 @@ void Server::viewListUpdate(int id)
 		}
 	}
 
-	ScPacketRemovePlayer remove;
-	remove.packetSize = sizeof(ScPacketRemovePlayer);
-	remove.packetType = SC_REMOVE_PLAYER;
-	for (auto i : removeList)
-	{
-		if (i >= OBJECT_START)
-		{
-			remove.id = i;
-			sendPacket(id, &put);
-		}
-		else
-		{
-			remove.id = i;
-			sendPacket(id, &put);
-		}
-	}
 
-	for (auto i : removeList)
-	{
-		if (i >= OBJECT_START)
-		{
-			continue;
-		}
-		else
-		{
-			remove.id = id;
-			sendPacket(i, &put);
-		}
-	}
 }
 void Server::sendPacket(int client, void* packet)
 {
