@@ -171,11 +171,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		{
 			if (true==s->players[p].getConnect())
 			{
-				if(p==s->players[0].getID())
-					Rectangle(hdc, globalX, globalY, globalX + 40, globalY + 40);
-				else
+				//if(p==s->players[0].getID())
+				//	Rectangle(hdc, globalX, globalY, globalX + 40, globalY + 40);
+				//else
 					Rectangle(hdc, s->players[p].getPositionX() , s->players[p].getPositionY(),
-						s->players[p].getPositionX()+40, s->players[p].getPositionY()+40);
+						s->players[p].getPositionX()+20, s->players[p].getPositionY()+20);
 			}
 		}
 		//--------------더블버퍼링-------------------------

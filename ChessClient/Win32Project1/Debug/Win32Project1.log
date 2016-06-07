@@ -1,1 +1,6 @@
-﻿  Win32Project1.vcxproj -> E:\GameServerMMORPG\GameServerMMORPG\ChessClient\Debug\Win32Project1.exe
+﻿  main.cpp
+e:\gameservermmorpg\gameservermmorpg\chessclient\win32project1\main.cpp(85): warning C4101: 'oldBrushBlack' :참조되지 않은 지역 변수입니다.
+e:\gameservermmorpg\gameservermmorpg\chessclient\win32project1\main.cpp(84): warning C4101: 'oldBrush' :참조되지 않은 지역 변수입니다.
+e:\gameservermmorpg\gameservermmorpg\chessclient\win32project1\main.cpp(85): warning C4101: 'hBrushBlack' :참조되지 않은 지역 변수입니다.
+e:\gameservermmorpg\gameservermmorpg\chessclient\win32project1\main.cpp(84): warning C4101: 'hBrush' :참조되지 않은 지역 변수입니다.
+  Win32Project1.vcxproj -> E:\GameServerMMORPG\GameServerMMORPG\ChessClient\Debug\Win32Project1.exe

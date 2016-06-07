@@ -446,7 +446,27 @@ void Server::viewListUpdate(int id)
 		}
 		else 	players[i].pLock.unlock();
 	}
+	ScPacketRemovePlayer remove;
+	remove.packetSize = sizeof(ScPacketRemovePlayer);
+	remove.packetType = SC_REMOVE_PLAYER;
+	for (auto i : removeList)
+	{
+		remove.id = i;
+		sendPacket(id, &remove);
+	}
 
+	for (auto i : removeList)
+	{
+		if (i >= OBJECT_START)
+		{
+			continue;	//몬스터의 경우는 지나간다.
+		}
+		else
+		{
+			remove.id = id;
+			sendPacket(i, &remove);
+		}
+	}
 
 	//nearlist에 있는 대상들을 뿌려준다.
 	ScPacketPutPlayer put;
