@@ -19,4 +19,5 @@ public:
 	static void sendPacket(int client, void* packet);
 	static void viewListUpdate(int id);
 	static void updateSector(int id);
+	static void monsterProcessPacket(int id);
 };

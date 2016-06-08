@@ -8,6 +8,7 @@ enum buffType
 };
 struct Object
 {
+	int id;
 	int x;
 	int y;
 	bool isActive;

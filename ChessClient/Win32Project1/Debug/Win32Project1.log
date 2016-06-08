@@ -1,14 +1,13 @@
 ﻿  stdafx.cpp
-cl : 명령줄 warning D9028: 최소 다시 빌드에 실패했습니다. 정상 빌드로 되돌립니다.
   main.cpp
-d:\졸 업 작 품\servertermproject\gameservermmorpg\chessclient\win32project1\main.cpp(85): warning C4101: 'oldBrushBlack' :참조되지 않은 지역 변수입니다.
-d:\졸 업 작 품\servertermproject\gameservermmorpg\chessclient\win32project1\main.cpp(84): warning C4101: 'oldBrush' :참조되지 않은 지역 변수입니다.
-d:\졸 업 작 품\servertermproject\gameservermmorpg\chessclient\win32project1\main.cpp(85): warning C4101: 'hBrushBlack' :참조되지 않은 지역 변수입니다.
-d:\졸 업 작 품\servertermproject\gameservermmorpg\chessclient\win32project1\main.cpp(84): warning C4101: 'hBrush' :참조되지 않은 지역 변수입니다.
+e:\gameservermmorpg\gameservermmorpg\chessclient\win32project1\main.cpp(85): warning C4101: 'oldBrushBlack' :참조되지 않은 지역 변수입니다.
+e:\gameservermmorpg\gameservermmorpg\chessclient\win32project1\main.cpp(84): warning C4101: 'oldBrush' :참조되지 않은 지역 변수입니다.
+e:\gameservermmorpg\gameservermmorpg\chessclient\win32project1\main.cpp(85): warning C4101: 'hBrushBlack' :참조되지 않은 지역 변수입니다.
+e:\gameservermmorpg\gameservermmorpg\chessclient\win32project1\main.cpp(84): warning C4101: 'hBrush' :참조되지 않은 지역 변수입니다.
   Server.cpp
-d:\졸 업 작 품\servertermproject\gameservermmorpg\chessclient\win32project1\server.cpp(77): warning C4018: '>=': signed 또는 unsigned가 일치하지 않습니다.
-d:\졸 업 작 품\servertermproject\gameservermmorpg\chessclient\win32project1\server.cpp(102): warning C4101: 'iobyte' :참조되지 않은 지역 변수입니다.
+e:\gameservermmorpg\gameservermmorpg\chessclient\win32project1\server.cpp(91): warning C4018: '>=': signed 또는 unsigned가 일치하지 않습니다.
+e:\gameservermmorpg\gameservermmorpg\chessclient\win32project1\server.cpp(116): warning C4101: 'iobyte' :참조되지 않은 지역 변수입니다.
   Player.cpp
   GameBoard.cpp
   코드를 생성하고 있습니다...
-  Win32Project1.vcxproj -> D:\졸 업 작 품\serverTermProject\GameServerMMORPG\ChessClient\Debug\Win32Project1.exe
+  Win32Project1.vcxproj -> E:\GameServerMMORPG\GameServerMMORPG\ChessClient\Debug\Win32Project1.exe

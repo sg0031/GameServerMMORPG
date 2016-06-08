@@ -18,7 +18,7 @@ Server::Server()
 	{
 		if (i >= RABBIT_START)
 		{
-			objects[i] = new Rabit;
+			objects[i] = new Rabbit;
 
 			int x = rand() % 2000;
 			int y = rand() % 2000;
@@ -28,39 +28,46 @@ Server::Server()
 			gameMap[x / DIVDIE_SECTOR][y / DIVDIE_SECTOR].object.insert(i);
 
 		}
-		if (i >= ARGO_START)
-		{
-			objects[i] = new Agro;
-			int x = rand() % 2000;
-			int y = rand() % 2000;
-			objects[i]->setPosX(x);
-			objects[i]->setPosY(y);
-			objects[i]->setActive(false);
-			gameMap[x / DIVDIE_SECTOR][y / DIVDIE_SECTOR].object.insert(i);
-		}
-		if (i >= BABY_START)
-		{
-			objects[i] = new Baby;
-			int x = rand() % 2000;
-			int y = rand() % 2000;
-			objects[i]->setPosX(x);
-			objects[i]->setPosY(y);
-			objects[i]->setActive(false);
-			gameMap[x / DIVDIE_SECTOR][y / DIVDIE_SECTOR].object.insert(i);
-			for (auto j = i+1; j < i + 6; ++j) {
-				objects[j] = new BabyGuard;
-				int x = rand() % 2000;
-				int y = rand() % 2000;
-				objects[j]->setPosX(x);
-				objects[j]->setPosY(y);
-				objects[j]->setActive(false);
-				gameMap[x / DIVDIE_SECTOR][y / DIVDIE_SECTOR].object.insert(j);
-			}	
-			i += 5;
-		}
+		//if (i >= ARGO_START)
+		//{
+		//	objects[i] = new Agro;
+		//	int x = rand() % 2000;
+		//	int y = rand() % 2000;
+		//	objects[i]->setPosX(x);
+		//	objects[i]->setPosY(y);
+		//	objects[i]->setActive(false);
+		//	gameMap[x / DIVDIE_SECTOR][y / DIVDIE_SECTOR].object.insert(i);
+		//}
+		//if (i >= BABY_START)
+		//{
+		//	objects[i] = new Baby;
+		//	int x = rand() % 2000;
+		//	int y = rand() % 2000;
+		//	objects[i]->setPosX(x);
+		//	objects[i]->setPosY(y);
+		//	objects[i]->setActive(false);
+		//	gameMap[x / DIVDIE_SECTOR][y / DIVDIE_SECTOR].object.insert(i);
+		//	for (auto j = i+1; j < i + 6; ++j) {
+		//		objects[j] = new BabyGuard;
+		//		int x = rand() % 2000;
+		//		int y = rand() % 2000;
+		//		objects[j]->setPosX(x);
+		//		objects[j]->setPosY(y);
+		//		objects[j]->setActive(false);
+		//		gameMap[x / DIVDIE_SECTOR][y / DIVDIE_SECTOR].object.insert(j);
+		//	}	
+		//	i += 5;
+		//}
 		else
 		{
-			int ran = rand() % 2;
+			objects[i] = new Stone;
+			int x = rand() % 2000;
+			int y = rand() % 2000;
+			objects[i]->setPosX(x);
+			objects[i]->setPosY(y);
+			objects[i]->setActive(false);
+			gameMap[x / DIVDIE_SECTOR][y / DIVDIE_SECTOR].object.insert(i);
+	/*		int ran = rand() % 2;
 			if (0 == ran / 2)
 			{
 				objects[i] = new Stone;
@@ -80,7 +87,7 @@ Server::Server()
 				objects[i]->setPosY(y);
 				objects[i]->setActive(false);
 				gameMap[x / DIVDIE_SECTOR][y / DIVDIE_SECTOR].object.insert(i);
-			}
+			}*/
 
 		}
 	}
@@ -263,7 +270,50 @@ void Server::workerThread()
 		{
 			delete over;
 		}
+		else if (over->operationType == MonsterUpdate)
+		{
+			objects[static_cast<int>(objectId)]->upDate();		//몬스터 상태 업데이트
+			monsterProcessPacket(static_cast<int>(objectId));   //몬스터 업데이트후에 패킷을 뿌려줌
+
+			delete over;
+		}
 	}
+}
+void Server::monsterProcessPacket(int id)
+{
+	ScPacketMove packet;
+	packet.pakcetSize = sizeof(ScPacketMove);
+	packet.id = id;
+	packet.packetType = SC_MOVE_POSITION;
+	packet.position.x = objects[id]->getPosX();
+	packet.position.y = objects[id]->getPosY();
+
+	int startSectorX = (objects[id]->getPosX() / DIVDIE_SECTOR) - 1;
+	int startSectorY = (objects[id]->getPosY() / DIVDIE_SECTOR) - 1;
+	int endSectorX = (objects[id]->getPosX() / DIVDIE_SECTOR) + 1;
+	int endSectorY = (objects[id]->getPosY() / DIVDIE_SECTOR) + 1;
+
+	if (startSectorX < 0)
+		startSectorX = 0;
+	if (startSectorY < 0)
+		startSectorY = 0;
+	if (endSectorX > MAX_SECTOR_SIZE)
+		endSectorX = MAX_SECTOR_SIZE;
+	if (endSectorY > MAX_SECTOR_SIZE)
+		endSectorY = MAX_SECTOR_SIZE;
+	//시야주변 섹터를 돌면서 현재 위치를 바탕으로 검사를 진행한다.
+	for (auto i = startSectorX; i <= endSectorX; i++)
+	{
+		for (auto j = startSectorY; j <= endSectorY; ++j)
+		{
+			for (auto i : gameMap[i][j].player)
+			{
+				if (0 == gameMap[i][j].player.size()) continue;
+				sendPacket(i, &packet);
+			}
+		}
+	}
+
 }
 void Server::processPacket(int id, char *ptr, double deltaTime)
 {
@@ -295,6 +345,7 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 
 		updateSector(id);
 		viewListUpdate(id);
+
 
 		break;
 	}
@@ -357,6 +408,12 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 	for (auto i : players[id].pViewList)
 		sendPacket(i, &packet);
 	players[id].pLock.unlock();
+
+	players[id].pLock.lock();
+	for (auto i : players[id].pObjectList)
+		timer.AddGameEvent(MonsterUpdate, i, 1000);
+	players[id].pLock.unlock();
+
 }
 void Server::updateSector(int id)
 {

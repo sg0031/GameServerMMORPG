@@ -14,7 +14,21 @@ Server::~Server()
 }
 int Server::socketinit(char* ip)
 {
+	int count = 0;
+	for (auto i = OBJECT_START; i < MAX_OBJECT+ OBJECT_START; ++i)
+	{
+		objects[count].id = i;
+		objects[count].isActive = false;
+		if (i >= RABBIT_START)
+		{
+			objects[count].type = Rabbit;
+		}
+		else
+		{
 
+		}
+		count++;
+	}
 	WSADATA wsa;
 	int ret = 0;
 	//char ip[10];
@@ -175,6 +189,10 @@ void Server::ProcessPacket(char* buf)
 					break;
 				}
 			}
+		}
+		else
+		{
+
 		}
 		break;
 	}

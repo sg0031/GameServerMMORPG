@@ -1,4 +1,11 @@
 #pragma once
+enum MonsterType
+{
+	Stone=100,
+	Tree,
+	Rabbit
+};
+
 enum EOperationType
 {
 	Sendtype = 1,
