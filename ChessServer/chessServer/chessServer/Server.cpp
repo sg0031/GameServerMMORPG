@@ -19,43 +19,68 @@ Server::Server()
 		if (i >= RABBIT_START)
 		{
 			objects[i] = new Rabit;
-			objects[i]->setPosX(rand() % 2000+1);
-			objects[i]->setPosY(rand() % 2000+1);
+
+			int x = rand() % 2000;
+			int y = rand() % 2000;
+			objects[i]->setPosX(x);
+			objects[i]->setPosY(y);
 			objects[i]->setActive(false);
+			gameMap[x / DIVDIE_SECTOR][y / DIVDIE_SECTOR].object.insert(i);
+
 		}
 		if (i >= ARGO_START)
 		{
 			objects[i] = new Agro;
-			objects[i]->setPosX(rand() % 2000 + 1);
-			objects[i]->setPosY(rand() % 2000 + 1);
+			int x = rand() % 2000;
+			int y = rand() % 2000;
+			objects[i]->setPosX(x);
+			objects[i]->setPosY(y);
 			objects[i]->setActive(false);
+			gameMap[x / DIVDIE_SECTOR][y / DIVDIE_SECTOR].object.insert(i);
 		}
 		if (i >= BABY_START)
 		{
 			objects[i] = new Baby;
-			objects[i]->setPosX(rand() % 2000 + 1);
-			objects[i]->setPosY(rand() % 2000 + 1);
+			int x = rand() % 2000;
+			int y = rand() % 2000;
+			objects[i]->setPosX(x);
+			objects[i]->setPosY(y);
 			objects[i]->setActive(false);
+			gameMap[x / DIVDIE_SECTOR][y / DIVDIE_SECTOR].object.insert(i);
 			for (auto j = i+1; j < i + 6; ++j) {
 				objects[j] = new BabyGuard;
-				objects[j]->setPosX(rand() % 2000 + 1);
-				objects[j]->setPosY(rand() % 2000 + 1);
+				int x = rand() % 2000;
+				int y = rand() % 2000;
+				objects[j]->setPosX(x);
+				objects[j]->setPosY(y);
 				objects[j]->setActive(false);
+				gameMap[x / DIVDIE_SECTOR][y / DIVDIE_SECTOR].object.insert(j);
 			}	
 			i += 5;
 		}
 		else
 		{
-			objects[i] = new Object;
-			objects[i]->setPosX(rand() % 2000 + 1);
-			objects[i]->setPosY(rand() % 2000 + 1);
-			objects[i]->setActive(false);
-		}
-	}
-	for (auto i = 0; i < MAX_SECTOR_SIZE; ++i)
-	{
-		for (auto j = 0; j < MAX_SECTOR_SIZE; ++j)
-		{
+			int ran = rand() % 2;
+			if (0 == ran / 2)
+			{
+				objects[i] = new Stone;
+				int x = rand() % 2000;
+				int y = rand() % 2000;
+				objects[i]->setPosX(x);
+				objects[i]->setPosY(y);
+				objects[i]->setActive(false);
+				gameMap[x / DIVDIE_SECTOR][y / DIVDIE_SECTOR].object.insert(i);
+			}
+			else
+			{
+				objects[i] = new Tree;
+				int x = rand() % 2000;
+				int y = rand() % 2000;
+				objects[i]->setPosX(x);
+				objects[i]->setPosY(y);
+				objects[i]->setActive(false);
+				gameMap[x / DIVDIE_SECTOR][y / DIVDIE_SECTOR].object.insert(i);
+			}
 
 		}
 	}
