@@ -14,34 +14,6 @@ Server::~Server()
 }
 int Server::socketinit(char* ip)
 {
-	//boardsetting
-	int x = 0;
-	int y = 0;
-	for (int i = 0; i < WIDTH; ++i)
-	{
-		for (int j = 0; j < HEIGHT; ++j)
-		{
-			if (i % 2 == 0)
-			{
-				if (j % 2 == 0)
-					board[i][j].setType(1);
-				else
-					board[i][j].setType(0);
-			}
-			else
-			{
-				if (j % 2 == 0)
-					board[i][j].setType(0);
-				else
-					board[i][j].setType(1);
-			}
-			board[i][j].setBoardx(x);
-			board[i][j].setBoardy(y);
-			x += WIDTHRECTANGLE;
-		}
-		y += HEIGHTRECTANGLE;
-		x = 0;
-	}
 
 	WSADATA wsa;
 	int ret = 0;
@@ -182,23 +154,26 @@ void Server::ProcessPacket(char* buf)
 		ScPacketPutPlayer *position =
 			reinterpret_cast<ScPacketPutPlayer*>(buf);
 		//cout << "set : " << position->position.x<<","<<position->position.y<< endl;
-		for (auto i = 1; i < MAX_PLAYER; ++i)
+		if (position->id < OBJECT_START)
 		{
-			if (-1 == players[i].getID())
+			for (auto i = 1; i < MAX_PLAYER; ++i)
 			{
-				players[i].setID(position->id);
-				players[i].setPositionX(position->position.x);
-				players[i].setPositionY(position->position.y);
-				players[i].setConnect(true);
-				break;
-			}
-			else if (position->id == players[i].getID())
-			{
-				players[i].setID(position->id);
-				players[i].setPositionX(position->position.x);
-				players[i].setPositionY(position->position.y);
-				players[i].setConnect(true);
-				break;
+				if (-1 == players[i].getID())
+				{
+					players[i].setID(position->id);
+					players[i].setPositionX(position->position.x);
+					players[i].setPositionY(position->position.y);
+					players[i].setConnect(true);
+					break;
+				}
+				else if (position->id == players[i].getID())
+				{
+					players[i].setID(position->id);
+					players[i].setPositionX(position->position.x);
+					players[i].setPositionY(position->position.y);
+					players[i].setConnect(true);
+					break;
+				}
 			}
 		}
 		break;
@@ -208,13 +183,16 @@ void Server::ProcessPacket(char* buf)
 		ScPacketMove *pos =
 			reinterpret_cast<ScPacketMove*>(buf);
 		//cout << "pos : " << pos->position.x <<","<<pos->position.y<< endl;
-		for (int i = 0; i < MAX_PLAYER; ++i)
+		if (pos->id < OBJECT_START)
 		{
-			if (pos->id == players[i].getID())
+			for (int i = 0; i < MAX_PLAYER; ++i)
 			{
-				players[i].setPositionX(pos->position.x);
-				players[i].setPositionY(pos->position.y);
-				break;
+				if (pos->id == players[i].getID())
+				{
+					players[i].setPositionX(pos->position.x);
+					players[i].setPositionY(pos->position.y);
+					break;
+				}
 			}
 		}
 		break;
@@ -222,19 +200,23 @@ void Server::ProcessPacket(char* buf)
 	case SC_REMOVE_PLAYER:
 	{
 		cout << "remove" << endl;
-		ScPacketRemovePlayer *remove=reinterpret_cast<ScPacketRemovePlayer*>(buf);
-		for (auto i = 0; i < MAX_PLAYER; ++i)
+		ScPacketRemovePlayer *remove = reinterpret_cast<ScPacketRemovePlayer*>(buf);
+		if (remove->id < OBJECT_START)
 		{
-			if (remove->id == players[i].getID())
+			for (auto i = 0; i < MAX_PLAYER; ++i)
 			{
-				players[i].setPositionX(-10);
-				players[i].setPositionY(-10);
-				players[i].setConnect(false);
-				break;
+				if (remove->id == players[i].getID())
+				{
+					players[i].setPositionX(-10);
+					players[i].setPositionY(-10);
+					players[i].setConnect(false);
+					break;
+				}
 			}
 		}
 		break;
 	}
+	//스위치케이스문 끝나는 부분
 	}
 }
 void Server::SendPacket(SOCKET s, void* buf)

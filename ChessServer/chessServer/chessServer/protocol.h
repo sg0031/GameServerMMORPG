@@ -13,12 +13,15 @@
 #define WM_SOCKET WM_USER+1
 
 #define MAX_PLAYER 10
+#define MAX_OBJECT 3000
 #define MAX_MAP_SIZE 2000
 #define DIVDIE_SECTOR 100
 #define MAX_SECTOR_SIZE 20
 
-#define MONSTER_START 2000
 #define OBJECT_START 1000
+#define RABBIT_START 1500
+#define ARGO_START 2000
+#define BABY_START 2500
 
 
 struct Removeindex

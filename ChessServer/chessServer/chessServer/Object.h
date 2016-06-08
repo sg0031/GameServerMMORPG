@@ -10,6 +10,7 @@ enum buffType
 	dependUp
 };
 
+
 class Object
 {
 	bool active;
@@ -66,6 +67,15 @@ class Baby : public Monster
 public:
 	Baby() {};
 	~Baby() {};
+	virtual void upDate() {} //몬스터의 상태를 매번 업데이트해주는 메소드
+	virtual void move() {} //몬스터가 이동시에 발생되는 메소드
+	virtual bool attakcRange() { return false; } //몬스터의 공격범위를 판단해주는 메소드
+};
+class BabyGuard : public Monster
+{
+public:
+	BabyGuard() {};
+	~BabyGuard() {};
 	virtual void upDate() {} //몬스터의 상태를 매번 업데이트해주는 메소드
 	virtual void move() {} //몬스터가 이동시에 발생되는 메소드
 	virtual bool attakcRange() { return false; } //몬스터의 공격범위를 판단해주는 메소드

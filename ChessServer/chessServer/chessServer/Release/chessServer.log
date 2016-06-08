@@ -1,7 +1,17 @@
-﻿  TimerThread.cpp
+﻿  stdafx.cpp
+d:\졸 업 작 품\servertermproject\gameservermmorpg\chessserver\chessserver\chessserver\Object.h(26): warning C4800: 'int': 'true' 또는 'false'로 bool 값을 강제하고 있습니다(성능 경고).
+d:\졸 업 작 품\servertermproject\gameservermmorpg\chessserver\chessserver\chessserver\Player.h(51): warning C4244: '=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+d:\졸 업 작 품\servertermproject\gameservermmorpg\chessserver\chessserver\chessserver\Player.h(52): warning C4244: '=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  GameBoard.cpp
+  Object.cpp
+  Player.cpp
+  Sector.cpp
+  Server.cpp
+  TimerThread.cpp
+  chessServer.cpp
   코드를 생성하고 있습니다.
-  1 of 869 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    1 functions had inline decision re-evaluated but remain unchanged
+  25 of 892 functions ( 2.8%) were compiled, the rest were copied from previous compilation.
+    23 functions were new in current compilation
+    4 functions had inline decision re-evaluated but remain unchanged
   코드를 생성했습니다.
-  chessServer.vcxproj -> E:\GameServerMMORPG\GameServerMMORPG\ChessServer\chessServer\Release\chessServer.exe
+  chessServer.vcxproj -> D:\졸 업 작 품\serverTermProject\GameServerMMORPG\ChessServer\chessServer\Release\chessServer.exe

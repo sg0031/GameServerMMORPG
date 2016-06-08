@@ -14,6 +14,51 @@ HandleManager *hManger = HandleManager::getInstance();
 
 Server::Server()
 {
+	for (auto i = OBJECT_START; i < MAX_OBJECT+ OBJECT_START; ++i)
+	{
+		if (i >= RABBIT_START)
+		{
+			objects[i] = new Rabit;
+			objects[i]->setPosX(rand() % 2000+1);
+			objects[i]->setPosY(rand() % 2000+1);
+			objects[i]->setActive(false);
+		}
+		if (i >= ARGO_START)
+		{
+			objects[i] = new Agro;
+			objects[i]->setPosX(rand() % 2000 + 1);
+			objects[i]->setPosY(rand() % 2000 + 1);
+			objects[i]->setActive(false);
+		}
+		if (i >= BABY_START)
+		{
+			objects[i] = new Baby;
+			objects[i]->setPosX(rand() % 2000 + 1);
+			objects[i]->setPosY(rand() % 2000 + 1);
+			objects[i]->setActive(false);
+			for (auto j = i+1; j < i + 6; ++j) {
+				objects[j] = new BabyGuard;
+				objects[j]->setPosX(rand() % 2000 + 1);
+				objects[j]->setPosY(rand() % 2000 + 1);
+				objects[j]->setActive(false);
+			}	
+			i += 5;
+		}
+		else
+		{
+			objects[i] = new Object;
+			objects[i]->setPosX(rand() % 2000 + 1);
+			objects[i]->setPosY(rand() % 2000 + 1);
+			objects[i]->setActive(false);
+		}
+	}
+	for (auto i = 0; i < MAX_SECTOR_SIZE; ++i)
+	{
+		for (auto j = 0; j < MAX_SECTOR_SIZE; ++j)
+		{
+
+		}
+	}
 	srand((unsigned)time(NULL));
 	WSADATA wsa;
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
