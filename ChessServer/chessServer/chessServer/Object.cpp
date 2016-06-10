@@ -49,25 +49,25 @@ void Rabbit::randomMove()
 	case 0:
 	{
 		int x = getPosX();
-		setPosX(x++);
+		setPosX(x+2);
 		break;
 	}
 	case 1:
 	{
 		int x = getPosX();
-		setPosX(x--);
+		setPosX(x-2);
 		break;
 	}
 	case 2:
 	{
 		int y = getPosY();
-		setPosY(y++);
+		setPosY(y+2);
 		break;
 	}
 	case 3:
 	{
 		int y = getPosY();
-		setPosY(y--);
+		setPosY(y-2);
 		break;
 	}
 

@@ -1,13 +1,2 @@
-﻿  stdafx.cpp
-d:\졸 업 작 품\servertermproject\gameservermmorpg\chessserver\chessserver\chessserver\object.h(44): warning C4800: 'int': 'true' 또는 'false'로 bool 값을 강제하고 있습니다(성능 경고).
-d:\졸 업 작 품\servertermproject\gameservermmorpg\chessserver\chessserver\chessserver\player.h(51): warning C4244: '=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-d:\졸 업 작 품\servertermproject\gameservermmorpg\chessserver\chessserver\chessserver\player.h(52): warning C4244: '=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-  chessServer.cpp
-  TimerThread.cpp
-  Server.cpp
-  Sector.cpp
-  Player.cpp
+﻿  건너뛰고 있습니다... (관련된 변경 내용 없음)
   Object.cpp
-  GameBoard.cpp
-  코드를 생성하고 있습니다...
-  chessServer.vcxproj -> D:\졸 업 작 품\serverTermProject\GameServerMMORPG\ChessServer\chessServer\Debug\chessServer.exe

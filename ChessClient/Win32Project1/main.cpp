@@ -178,6 +178,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 						s->players[p].getPositionX()+20, s->players[p].getPositionY()+20);
 			}
 		}
+		for (int m = 0; m < MAX_OBJECT; ++m)
+		{
+			if(true==s->objects[m].isActive)
+				Rectangle(hdc, s->objects[m].x, s->objects[m].y,
+					s->objects[m].x + 20, s->objects[m].y + 20);
+		}
 		//--------------더블버퍼링-------------------------
 		//bMemdc1 = CreateCompatibleDC(hdc);
 		//// hBit1에는 배경과 텍스트가 출력된 비트맵이 저장, mem1dc에 설정

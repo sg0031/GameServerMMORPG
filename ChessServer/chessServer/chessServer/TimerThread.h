@@ -26,5 +26,7 @@ public:
 	void eventTimerThread();
 	void AddGameEvent(EOperationType eventType, int id, DWORD time);
 	void EventToWorkerThread(const GameEvent& new_event);
+	void timerLock() { TimerLock.lock(); }
+	void timerUnlock() { TimerLock.unlock(); }
 };
 

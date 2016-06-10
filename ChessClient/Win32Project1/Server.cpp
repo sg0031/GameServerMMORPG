@@ -25,7 +25,7 @@ int Server::socketinit(char* ip)
 		}
 		else
 		{
-
+			objects[count].type = Stone;
 		}
 		count++;
 	}
@@ -182,7 +182,6 @@ void Server::ProcessPacket(char* buf)
 				}
 				else if (position->id == players[i].getID())
 				{
-					players[i].setID(position->id);
 					players[i].setPositionX(position->position.x);
 					players[i].setPositionY(position->position.y);
 					players[i].setConnect(true);
@@ -192,7 +191,16 @@ void Server::ProcessPacket(char* buf)
 		}
 		else
 		{
-
+			for (auto i = 0; i < MAX_OBJECT; ++i)
+			{
+				if (position->id == objects[i].id)
+				{
+					objects[i].x = position->position.x;
+					objects[i].y = position->position.y;
+					objects[i].isActive = true;
+					break;
+				}
+			}
 		}
 		break;
 	}
@@ -213,6 +221,18 @@ void Server::ProcessPacket(char* buf)
 				}
 			}
 		}
+		else
+		{
+			for (auto i = 0; i < MAX_OBJECT; ++i)
+			{
+				if (pos->id == objects[i].id)
+				{
+					objects[i].x = pos->position.x;
+					objects[i].y = pos->position.y;
+					break;
+				}
+			}
+		}
 		break;
 	}
 	case SC_REMOVE_PLAYER:
@@ -228,6 +248,17 @@ void Server::ProcessPacket(char* buf)
 					players[i].setPositionX(-10);
 					players[i].setPositionY(-10);
 					players[i].setConnect(false);
+					break;
+				}
+			}
+		}
+		else
+		{
+			for (auto i = 0; i < MAX_OBJECT; ++i)
+			{
+				if (remove->id == objects[i].id)
+				{
+					objects[i].isActive = false;
 					break;
 				}
 			}

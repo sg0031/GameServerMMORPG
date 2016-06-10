@@ -272,7 +272,7 @@ void Server::workerThread()
 		}
 		else if (over->operationType == MonsterUpdate)
 		{
-			objects[static_cast<int>(objectId)]->upDate();		//몬스터 상태 업데이트
+			//objects[static_cast<int>(objectId)]->upDate();		//몬스터 상태 업데이트
 			monsterProcessPacket(static_cast<int>(objectId));   //몬스터 업데이트후에 패킷을 뿌려줌
 
 			delete over;
@@ -281,6 +281,9 @@ void Server::workerThread()
 }
 void Server::monsterProcessPacket(int id)
 {
+	objects[id]->upDate();
+	unordered_set<int> nearList;
+
 	ScPacketMove packet;
 	packet.pakcetSize = sizeof(ScPacketMove);
 	packet.id = id;
@@ -306,14 +309,17 @@ void Server::monsterProcessPacket(int id)
 	{
 		for (auto j = startSectorY; j <= endSectorY; ++j)
 		{
+			if (0 == gameMap[i][j].player.size()) continue;
 			for (auto i : gameMap[i][j].player)
 			{
-				if (0 == gameMap[i][j].player.size()) continue;
-				sendPacket(i, &packet);
+				nearList.insert(i);
 			}
 		}
 	}
-
+	for(auto i:nearList)
+		sendPacket(i, &packet);
+	if(true==objects[id]->getActive())
+		timer.AddGameEvent(MonsterUpdate, id, 1000);
 }
 void Server::processPacket(int id, char *ptr, double deltaTime)
 {
@@ -346,6 +352,10 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		updateSector(id);
 		viewListUpdate(id);
 
+		//players[id].pLock.lock();
+		//for (auto i : players[id].pObjectList)
+		//	timer.AddGameEvent(MonsterUpdate, i, 1000);
+		//players[id].pLock.unlock();
 
 		break;
 	}
@@ -408,12 +418,6 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 	for (auto i : players[id].pViewList)
 		sendPacket(i, &packet);
 	players[id].pLock.unlock();
-
-	players[id].pLock.lock();
-	for (auto i : players[id].pObjectList)
-		timer.AddGameEvent(MonsterUpdate, i, 1000);
-	players[id].pLock.unlock();
-
 }
 void Server::updateSector(int id)
 {
@@ -497,7 +501,10 @@ void Server::viewListUpdate(int id)
 			if (0==players[id].pObjectList.count(i))
 			{
 				players[id].pObjectList.insert(i);
-				objects[i]->setActive(true); //플레이어의 시야에 들어왔기떄문에 오브젝트를 활동상태로 바꿔줘야한다.
+				if (false == objects[i]->getActive()) {
+					objects[i]->setActive(true); //플레이어의 시야에 들어왔기떄문에 오브젝트를 활동상태로 바꿔줘야한다.
+					timer.AddGameEvent(MonsterUpdate, i, 1000);
+				}
 				players[id].pLock.unlock();	
 			}
 			else
@@ -557,6 +564,8 @@ void Server::viewListUpdate(int id)
 		if (i >= OBJECT_START)
 		{
 			players[id].pObjectList.erase(i);
+			if(true==objects[i]->getActive())
+				objects[i]->setActive(false);
 		}
 		else
 			players[id].pViewList.erase(i);
@@ -631,8 +640,6 @@ void Server::viewListUpdate(int id)
 			sendPacket(i, &put);
 		}
 	}
-
-
 }
 void Server::sendPacket(int client, void* packet)
 {
