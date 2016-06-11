@@ -180,9 +180,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		}
 		for (int m = 0; m < MAX_OBJECT; ++m)
 		{
-			if(true==s->objects[m].isActive)
-				Rectangle(hdc, s->objects[m].x, s->objects[m].y,
-					s->objects[m].x + 20, s->objects[m].y + 20);
+			if (true == s->objects[m].isActive) {
+				if(Rabbit==s->objects[m].type)
+					Rectangle(hdc, s->objects[m].x, s->objects[m].y,
+						s->objects[m].x + 20, s->objects[m].y + 20);
+				else
+					Ellipse(hdc, s->objects[m].x, s->objects[m].y,
+						s->objects[m].x + 20, s->objects[m].y + 20);
+			}
+
 		}
 		//--------------더블버퍼링-------------------------
 		//bMemdc1 = CreateCompatibleDC(hdc);

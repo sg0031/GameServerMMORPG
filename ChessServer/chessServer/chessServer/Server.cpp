@@ -318,8 +318,9 @@ void Server::monsterProcessPacket(int id)
 	}
 	for(auto i:nearList)
 		sendPacket(i, &packet);
-	if(true==objects[id]->getActive())
+	if(0!=nearList.size())
 		timer.AddGameEvent(MonsterUpdate, id, 1000);
+	else if (true == nearList.empty()) objects[id]->setActive(false);
 }
 void Server::processPacket(int id, char *ptr, double deltaTime)
 {
@@ -351,11 +352,6 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 
 		updateSector(id);
 		viewListUpdate(id);
-
-		//players[id].pLock.lock();
-		//for (auto i : players[id].pObjectList)
-		//	timer.AddGameEvent(MonsterUpdate, i, 1000);
-		//players[id].pLock.unlock();
 
 		break;
 	}
@@ -564,8 +560,6 @@ void Server::viewListUpdate(int id)
 		if (i >= OBJECT_START)
 		{
 			players[id].pObjectList.erase(i);
-			if(true==objects[i]->getActive())
-				objects[i]->setActive(false);
 		}
 		else
 			players[id].pViewList.erase(i);
