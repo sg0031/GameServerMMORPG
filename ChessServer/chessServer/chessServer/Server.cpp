@@ -24,6 +24,7 @@ Server::Server()
 			int y = rand() % 2000;
 			objects[i]->setPosX(x);
 			objects[i]->setPosY(y);
+			objects[i]->setReturnPos(x, y);
 			objects[i]->setActive(false);
 			gameMap[x / DIVDIE_SECTOR][y / DIVDIE_SECTOR].object.insert(i);
 
@@ -239,6 +240,7 @@ void Server::workerThread()
 				{
 					double newTime = clock();
 					double frameTime = newTime - currentTime;
+					frameTime = frameTime / 1000;
 					if (frameTime > 0.25)
 						frameTime = 0.25;
 					currentTime = newTime;
@@ -281,8 +283,9 @@ void Server::workerThread()
 }
 void Server::monsterProcessPacket(int id)
 {
-	objects[id]->upDate();
+	//objects[id]->upDate();
 	unordered_set<int> nearList;
+	D3DXVECTOR2 targetPos;
 
 	ScPacketMove packet;
 	packet.pakcetSize = sizeof(ScPacketMove);
@@ -316,9 +319,22 @@ void Server::monsterProcessPacket(int id)
 			}
 		}
 	}
-	for(auto i:nearList)
+	if (0 != nearList.size()) {
+		for (auto i : nearList) {
+			targetPos.x = players[i].getPositionX();
+			targetPos.y = players[i].getPositionY();
+			if (-1 == objects[id]->getTarget()) {
+				objects[id]->setTarget(i);
+			}
+			objects[id]->setTagetPos(targetPos.x, targetPos.y);
+			if (true == objects[id]->chaseRange())
+				objects[id]->upDate();	
+		}
+	}
+	objects[id]->upDate();
+	for (auto i : nearList)
 		sendPacket(i, &packet);
-	if(0!=nearList.size())
+	if (0 != nearList.size())
 		timer.AddGameEvent(MonsterUpdate, id, 1000);
 	else if (true == nearList.empty()) objects[id]->setActive(false);
 }
@@ -357,43 +373,59 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 	}
 	case CS_RIGHT:
 	{
+		D3DXVECTOR2 dir = { 1,0 };
+		D3DXVECTOR2 pos;
 		//	cout << "Right" << endl;
 		CsPacketMove *movePacket = reinterpret_cast<CsPacketMove*>(ptr);
-		int x = players[id].getPositionX();
-		if (x + 1 > MAX_MAP_SIZE)
-			x = MAX_MAP_SIZE;
-		else x++;
-		players[id].setPositionX(x);
+		pos.x= players[id].getPositionX();
+		pos.y = players[id].getPositionY();
+		if (pos.x + 1 > MAX_MAP_SIZE)
+			pos.x = MAX_MAP_SIZE;
+		pos = pos + (1 * dir);
+		players[id].setPositionX(pos.x);
+		players[id].setPositionY(pos.y);
 		break;
 	}
 	case CS_LEFT:
 	{
+		D3DXVECTOR2 dir = { -1,0 };
+		D3DXVECTOR2 pos;
 		CsPacketMove *movePacket = reinterpret_cast<CsPacketMove*>(ptr);
-		int x = players[id].getPositionX();
-		if (x - 1 < 0)
-			x = 0;
-		else x--;
-		players[id].setPositionX(x);
+		pos.x = players[id].getPositionX();
+		pos.y = players[id].getPositionY();
+		if (pos.x - 1 < 0)
+			pos.x = 0;
+		pos = pos + (1 * dir);
+		players[id].setPositionX(pos.x);
+		players[id].setPositionY(pos.y);
 		break;
 	}
 	case CS_UP:
 	{
+		D3DXVECTOR2 dir = { 0,-1 };
+		D3DXVECTOR2 pos;
 		CsPacketMove *movePacket = reinterpret_cast<CsPacketMove*>(ptr);
-		int y = players[id].getPositionY();
-		if (y - 1 < 0)
-			y = 0;
-		else y--;
-		players[id].setPositionY(y);
+		pos.x = players[id].getPositionX();
+		pos.y = players[id].getPositionY();
+		if (pos.y - 1 < 0)
+			pos.y = 0;
+		pos = pos + (1 * dir);
+		players[id].setPositionX(pos.x);
+		players[id].setPositionY(pos.y);
 		break;
 	}
 	case CS_DOWN:
 	{
+		D3DXVECTOR2 dir = { 0,1 };
+		D3DXVECTOR2 pos;
 		CsPacketMove *movePacket = reinterpret_cast<CsPacketMove*>(ptr);
-		int y = players[id].getPositionY();
-		if (y + 1 > MAX_MAP_SIZE)
-			y = MAX_MAP_SIZE;
-		else y++;
-		players[id].setPositionY(y);
+		pos.x = players[id].getPositionX();
+		pos.y = players[id].getPositionY();
+		if (pos.y + 1 > MAX_MAP_SIZE)
+			pos.y = MAX_MAP_SIZE;
+		pos = pos + (1 * dir);
+		players[id].setPositionX(pos.x);
+		players[id].setPositionY(pos.y);
 		break;
 	}
 

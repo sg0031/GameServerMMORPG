@@ -18,6 +18,7 @@
 #include<queue>
 #include<mutex>
 #include<map>
+#include <D3DX10Math.h>
 #include<unordered_set>
 #include"protocol.h"
 #include"packetType.h"

@@ -20,10 +20,14 @@ enum MonsterState
 
 class Object
 {
+	D3DXVECTOR2 dir;
 	bool active;
+	float speed;
 	int x;
 	int y;
 	int target;
+	D3DXVECTOR2 targetPos;
+	D3DXVECTOR2 returnPos;
 protected:
 	buffType buff;   //몬스터를 잡았을시에 플레이어가 획득할수 있는 버프
 	int type;    //몬스터의 선공형인지 후공형인지 판단
@@ -40,7 +44,15 @@ public:
 	~Object() {};
 	void setTarget(int ta) { target = ta; }
 	int getTarget() { return target; }
+	void setDir(D3DXVECTOR2 dr) { dir = dr; }
+	D3DXVECTOR2 getDir() { return dir; }
+	void setSpeed(float spd) { speed = spd; }
+	float getSpeed() { return speed; }
+	void setTagetPos(int x, int y) { targetPos.x = x; targetPos.y = y; }
+	D3DXVECTOR2 getTagetPos() {return targetPos;}
 
+	void setReturnPos(float x, float y) { returnPos.x = x; returnPos.y = y; }
+	D3DXVECTOR2 getReturnPos() { return returnPos; }
 	void setPosX(int x) { this->x = x; }
 	void setPosY(int y) { this->y = y; }
 	int getPosX() { return x; }
@@ -84,6 +96,7 @@ public:
 		level=10;
 		gold=10;
 		state=waitState;
+		setSpeed(2.0);
 	};
 	~Rabbit() {};
 	virtual void upDate(); 
@@ -91,6 +104,7 @@ public:
 	virtual bool attakcRange(); 
 	virtual bool hitDamge();
 	virtual void randomMove();
+	virtual bool chaseRange();
 };
 //
 //class Baby : public Object
