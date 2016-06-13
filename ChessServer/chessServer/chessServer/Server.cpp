@@ -281,6 +281,16 @@ void Server::workerThread()
 
 			delete over;
 		}
+		else if (over->operationType == MonsterRespon)
+		{
+			int monID = static_cast<int>(objectId);
+			objects[monID]->responHP();
+			objects[monID]->setState(waitState);
+			objects[monID]->setTarget(-1);
+			timer.AddGameEvent(MonsterUpdate, monID, 1000);
+			cout << monID << "ºÎÈ°" << endl;
+			delete over;
+		}
 	}
 }
 void Server::monsterProcessPacket(int id)
@@ -344,12 +354,16 @@ void Server::monsterProcessPacket(int id)
 		objects[id]->setTagetPos(targetPos.x, targetPos.y);
 	}
 	objects[id]->upDate();
-	if (true == objects[id]->hitDamge() && 203!=objects[id]->getState())
+	if (true == objects[id]->hitDamge() && deadState!=objects[id]->getState())
 		players[objects[id]->getTarget()].decreaseHP(objects[id]->getAttack());
 	for (auto i : nearList)
 		sendPacket(i, &packet);
-	if (0 != nearList.size())
-		timer.AddGameEvent(MonsterUpdate, id, 1000);
+	if (0 != nearList.size()) {
+		if (deadState == objects[id]->getState())
+			timer.AddGameEvent(MonsterRespon, id, 10000);
+		else
+			timer.AddGameEvent(MonsterUpdate, id, 1000);
+	}
 	else if (true == nearList.empty()) objects[id]->setActive(false);
 }
 void Server::processPacket(int id, char *ptr, double deltaTime)

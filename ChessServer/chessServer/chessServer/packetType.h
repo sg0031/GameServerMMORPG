@@ -7,7 +7,8 @@ enum EOperationType
 {
 	Sendtype = 1,
 	Recvtype = 2,
-	MonsterUpdate
+	MonsterUpdate,
+	MonsterRespon
 };
 struct OverEx	//오버렙트구조체 확장
 {

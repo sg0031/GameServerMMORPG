@@ -44,6 +44,11 @@ protected:
 public:
 	Object() {};
 	~Object() {};
+	void setState(MonsterState st) { state = st; }
+	void responHP() { health = 100; }
+
+	void setHP(int hp) { health = hp; }
+	int getHP() { return health; }
 	void setAttack(int ack) { attack = ack; }
 	int getAttack() { return attack; }
 
