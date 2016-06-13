@@ -20,4 +20,5 @@ public:
 	static void viewListUpdate(int id);
 	static void updateSector(int id);
 	static void monsterProcessPacket(int id);
+	static bool attackCrushCheck(int player, int monster);
 };

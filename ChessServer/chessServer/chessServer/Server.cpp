@@ -22,6 +22,7 @@ Server::Server()
 
 			int x = rand() % 2000;
 			int y = rand() % 2000;
+			objects[i]->setID(i);
 			objects[i]->setPosX(x);
 			objects[i]->setPosY(y);
 			objects[i]->setReturnPos(x, y);
@@ -64,6 +65,7 @@ Server::Server()
 			objects[i] = new Stone;
 			int x = rand() % 2000;
 			int y = rand() % 2000;
+			objects[i]->setID(i);
 			objects[i]->setPosX(x);
 			objects[i]->setPosY(y);
 			objects[i]->setActive(false);
@@ -321,17 +323,29 @@ void Server::monsterProcessPacket(int id)
 	}
 	if (0 != nearList.size()) {
 		for (auto i : nearList) {
-			targetPos.x = players[i].getPositionX();
-			targetPos.y = players[i].getPositionY();
 			if (-1 == objects[id]->getTarget()) {
 				objects[id]->setTarget(i);
+				targetPos.x = players[i].getPositionX();
+				targetPos.y = players[i].getPositionY();
+				objects[id]->setTagetPos(targetPos.x, targetPos.y);
+				if (false == objects[id]->chaseRange()) {
+					objects[id]->setTarget(-1);
+					continue;
+				}
+				else if (true == objects[id]->chaseRange())
+					break;
 			}
-			objects[id]->setTagetPos(targetPos.x, targetPos.y);
-			if (true == objects[id]->chaseRange())
-				objects[id]->upDate();	
 		}
 	}
+	int tarID=objects[id]->getTarget();
+	if (-1 != tarID) {
+		targetPos.x = players[tarID].getPositionX();
+		targetPos.y = players[tarID].getPositionY();
+		objects[id]->setTagetPos(targetPos.x, targetPos.y);
+	}
 	objects[id]->upDate();
+	if (true == objects[id]->hitDamge() && 203!=objects[id]->getState())
+		players[objects[id]->getTarget()].decreaseHP(objects[id]->getAttack());
 	for (auto i : nearList)
 		sendPacket(i, &packet);
 	if (0 != nearList.size())
@@ -428,6 +442,17 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		players[id].setPositionY(pos.y);
 		break;
 	}
+	case CS_ATTACK_A:
+	{
+		players[id].pLock.lock();
+		for (auto i : players[id].pObjectList) {
+			if (true == attackCrushCheck(id, i)) {
+				objects[i]->decreaseHP(players[id].getAttack());
+			}
+		}
+		players[id].pLock.unlock();
+		break;
+	}
 
 	}
 	//매번 플레이어들의 위치값 갱신
@@ -446,6 +471,27 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 	for (auto i : players[id].pViewList)
 		sendPacket(i, &packet);
 	players[id].pLock.unlock();
+}
+bool Server::attackCrushCheck(int player, int monster)
+{
+	D3DXVECTOR2 pPos;
+	D3DXVECTOR2 monPos;
+	pPos.x = players[player].getPositionX();
+	pPos.y = players[player].getPositionY();
+	monPos.x = objects[monster]->getPosX();
+	monPos.y = objects[monster]->getPosY();
+	float dist = (monPos.x - pPos.x)
+		*(monPos.x - pPos.x)
+		+ (monPos.y - pPos.y)
+		* (monPos.y - pPos.y);
+	if (dist <= 5 * 5)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 void Server::updateSector(int id)
 {

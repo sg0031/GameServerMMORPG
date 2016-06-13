@@ -110,6 +110,15 @@ void Server::ReadPacket()
 
 	}
 }
+void Server::KeyDownAttack(WPARAM key)
+{
+	CsPacketLogin attack;
+	attack.packetSize = sizeof(CsPacketLogin);
+	if (key == 'A') {
+		attack.packetType = CS_ATTACK_A;
+		SendPacket(sock, &attack);
+	}
+}
 void Server::KeyDown(WPARAM wParam)
 {
 	int x = 0, y = 0, retval = 0;

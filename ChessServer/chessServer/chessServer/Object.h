@@ -15,7 +15,8 @@ enum MonsterState
 	waitState=200,
 	attackState,
 	chaseState,
-	deadState
+	deadState,
+	returnState
 };
 
 class Object
@@ -25,6 +26,7 @@ class Object
 	float speed;
 	int x;
 	int y;
+	int id;
 	int target;
 	D3DXVECTOR2 targetPos;
 	D3DXVECTOR2 returnPos;
@@ -42,6 +44,11 @@ protected:
 public:
 	Object() {};
 	~Object() {};
+	void setAttack(int ack) { attack = ack; }
+	int getAttack() { return attack; }
+
+	void setID(int id) { this->id = id; }
+	int getID() { return id; }
 	void setTarget(int ta) { target = ta; }
 	int getTarget() { return target; }
 	void setDir(D3DXVECTOR2 dr) { dir = dr; }
@@ -69,6 +76,8 @@ public:
 	virtual bool chaseRange() { return false; }//추격할때 호출되는 메소드
 	virtual bool hitDamge() { return false; }	//평화몬스터의 경우 이메소드를 이용해서 데미지를 입었는지 판단한다.
 	virtual void randomMove() {}; //랜덤하게 이동하는 메소드
+	virtual bool playerHit() { return false; }
+	virtual void decreaseHP(int attack) {};
 };
 class Stone :public Object
 {
@@ -105,6 +114,8 @@ public:
 	virtual bool hitDamge();
 	virtual void randomMove();
 	virtual bool chaseRange();
+	virtual bool playerHit();
+	virtual void decreaseHP(int attack);
 };
 //
 //class Baby : public Object

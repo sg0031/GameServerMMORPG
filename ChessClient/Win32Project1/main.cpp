@@ -129,7 +129,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		InvalidateRect(hwnd, NULL, TRUE);
 		break;
 	case WM_KEYDOWN:
-		s->KeyDown(wParam);
+		if(wParam==VK_LEFT || wParam==VK_RIGHT || wParam==VK_UP || wParam==VK_DOWN)
+			s->KeyDown(wParam);
+		if (wParam == 'A')
+			s->KeyDownAttack(wParam);
 		break;
 	case WM_TIMER:
 		//더블버퍼링---------------------------------

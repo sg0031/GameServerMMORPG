@@ -29,6 +29,7 @@ public:
 	void setHINSTANCE(HINSTANCE g) { inst = g; }
 	void ReadPacket();
 	void KeyDown(WPARAM wParam);
+	void KeyDownAttack(WPARAM key);
 	void ProcessPacket(char* buf);
 	void SendPacket(SOCKET s, void* buf);
 };

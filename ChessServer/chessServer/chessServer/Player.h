@@ -23,6 +23,7 @@ class Player
 	int acr; //플레이여 명중률
 	int statusCount; //레벨업시에 남아있는
 	int predSectorX, predSectorY;
+	int hitdamage;
 public:
 	Player();
 	~Player();
@@ -31,12 +32,17 @@ public:
 	std::unordered_set<int> pObjectList; //플레이어 주위의 오브젝트 리스트
 	int viewList[MAX_PLAYER];
 	OverEx* overEx;
-	
+	void setAttack(int ack) { attack = ack; }
+	int getAttack() { return attack; }
+	void setHitDamage(int hit) { hitdamage = hit; }
+	int getHitDamage() { return hitdamage; }
 	void setPredSectorX(int sx) { predSectorX = sx; }
 	void setPredSectorY(int sy) { predSectorY = sy; }
 	int getPredSectorX() { return predSectorX; }
 	int getPredSectorY() { return predSectorY; }
 
+	void decreaseHP(int ack) { health -= ack; std::cout << id << "현재 HP :" << health << std::endl; }
+	int getHp() { return health; }
 	//골드획득시 호출되는 메소드
 	void increaseGold(int gol) { gold += gol; }
 	//레벨업시에 호출되는 메소드
