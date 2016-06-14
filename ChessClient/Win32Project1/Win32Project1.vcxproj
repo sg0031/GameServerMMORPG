@@ -169,8 +169,11 @@
     <ResourceCompile Include="Win32Project1.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\argo.bmp" />
     <Image Include="..\baby.bmp" />
+    <Image Include="..\babyguard.bmp" />
     <Image Include="..\ChessPiece.bmp" />
+    <Image Include="..\Rabbit.bmp" />
     <Image Include="..\sky.bmp" />
     <Image Include="..\stone.bmp" />
   </ItemGroup>

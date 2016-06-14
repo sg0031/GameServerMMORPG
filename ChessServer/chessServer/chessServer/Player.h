@@ -1,9 +1,15 @@
 #pragma once
-#define PLAYER_START_POSX 260
-#define PLAYER_START_POSY 260
+#define PLAYER_START_POSX 4
+#define PLAYER_START_POSY 4
 #define PLAYER_INCREASE_HP 10 //퍼센트 단위
 #define MAX_HEALTH 1000
-
+enum PlayerState
+{
+	waitPlayer = 300,
+	attackPlayer,
+	walkPlayer,
+	deadPlayer
+};
 class Player
 {
 	int x; //플레이어 좌표
@@ -24,6 +30,9 @@ class Player
 	int statusCount; //레벨업시에 남아있는
 	int predSectorX, predSectorY;
 	int hitdamage;
+	int animateState;
+	int playerBuff;
+	int playerDeBuff;
 public:
 	Player();
 	~Player();
@@ -32,8 +41,18 @@ public:
 	std::unordered_set<int> pObjectList; //플레이어 주위의 오브젝트 리스트
 	int viewList[MAX_PLAYER];
 	OverEx* overEx;
+	void setDebuff(int de) { playerDeBuff = de; }
+	void setBuff(int bu) { playerBuff = bu; }
+	int getDebuff() { return playerDeBuff; }
+	int getPlayerBuff() { return playerBuff; }
+
+	void setState(int st) { animateState = st; }
+	int getState() { return animateState; }
 	void setAttack(int ack) { attack = ack; }
 	int getAttack() { return attack; }
+	void setDepend(int de) { depend = de; }
+	int getDepend() { return depend; }
+
 	void setHitDamage(int hit) { hitdamage = hit; }
 	int getHitDamage() { return hitdamage; }
 	void setPredSectorX(int sx) { predSectorX = sx; }

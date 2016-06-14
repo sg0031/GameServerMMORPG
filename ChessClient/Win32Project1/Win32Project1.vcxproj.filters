@@ -72,5 +72,14 @@
     <Image Include="..\baby.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
+    <Image Include="..\Rabbit.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\argo.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\babyguard.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
   </ItemGroup>
 </Project>

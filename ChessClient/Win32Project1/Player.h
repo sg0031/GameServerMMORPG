@@ -1,10 +1,29 @@
 #pragma once
-enum buffType
+enum MonsterState
 {
-	noBuff = 100,
-	attackUp,
-	speedUp,
-	dependUp
+	waitState = 200,
+	attackState,
+	chaseState,
+	deadState,
+	returnState
+};
+enum PlayerState
+{
+	leftWaitPlayer=300,
+	rightWaitPlayer,
+	upWaitPlayer,
+	downWaitPlayer,
+	waitPlayer,
+	attackPlayer,
+	leftAttackPlayer,
+	rightAttackPlayer,
+	upAttackPlayer,
+	downAttackPlayer,
+	leftWalkPlayer,
+	rightWalkPlayer,
+	upWalkPlayer,
+	downWalkPlayer,
+	deadPlayer
 };
 struct Object
 {
@@ -29,7 +48,17 @@ class Player
 	int y;
 	int id;
 	bool isConnect;
+	int state;
+	int mapDebuff;
+	int getBuff;
 public:
+	void setDebuff(int de) { mapDebuff = de; }
+	void setBuff(int bu) { getBuff = bu; }
+	int getDebuff() { return mapDebuff; }
+	int getPlayerBuff() { return getBuff; }
+
+	void setState(int st) { state = st; }
+	int getState() { return state; }
 	void setConnect(bool sCon) { isConnect = sCon; }
 	bool getConnect() { return isConnect; }
 	void setID(int i) { id=i; }

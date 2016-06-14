@@ -50,6 +50,28 @@ void drawBaby(HDC hdc, HBITMAP image, int posx, int posy,int sprightx,int sprigh
 	SelectObject(MemDC, OldBitmap);
 	DeleteDC(MemDC);
 }
+void drawRabbit(HDC hdc, HBITMAP image, int posx, int posy, int sprightx, int sprighty)
+{
+	HDC MemDC;
+	HBITMAP OldBitmap;
+	MemDC = CreateCompatibleDC(hdc);
+	OldBitmap = (HBITMAP)SelectObject(MemDC, image);
+	TransparentBlt(hdc, posx, posy,
+		WIDTHRECTANGLE, HEIGHTRECTANGLE, MemDC, sprightx, 0, sprightx+40, 40, RGB(255, 255, 255));
+	SelectObject(MemDC, OldBitmap);
+	DeleteDC(MemDC);
+}
+void drawRabbitWait(HDC hdc, HBITMAP image, int posx, int posy)
+{
+	HDC MemDC;
+	HBITMAP OldBitmap;
+	MemDC = CreateCompatibleDC(hdc);
+	OldBitmap = (HBITMAP)SelectObject(MemDC, image);
+	TransparentBlt(hdc, posx, posy,
+		WIDTHRECTANGLE, HEIGHTRECTANGLE, MemDC, 0, 0, 40, 40, RGB(255, 255, 255));
+	SelectObject(MemDC, OldBitmap);
+	DeleteDC(MemDC);
+}
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	LPSTR lpszCmdLine, int nCmdShow)
 {
@@ -105,14 +127,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 	HBRUSH hBrush, oldBrush;
 	HBRUSH hBrushBlack, oldBrushBlack;
 	static HBITMAP chessPiece,skyMap,oldBit1,oldBit2,oldBit3;
-	static HBITMAP stone,baby;
+	static HBITMAP stone,baby,rabbit,argo,babyguard;
 	static char ip[10];
-	static char pos[20];
+	static char pos[30];
+	static char debuff[100];
+	static char buff[100];
 	static int count;
 	int camaraPlayerX;
 	int camaraPlayerY;
 	int screenX;
 	int screenY;
+	static int frameCount;
 	
 	switch (iMsg)
 	{
@@ -138,13 +163,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		skyMap = LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BITMAP2));
 		stone= LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BITMAP3));
 		baby= LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BITMAP4));
+		rabbit= LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BITMAP5));
+		argo= LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BITMAP6));
+		babyguard= LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BITMAP7));
 		GetClientRect(hwnd, &crt);
 		count = 0;
 		camaraPlayerX = 0;
 		camaraPlayerY = 0;
 		screenX = 0;
 		screenY = 0;
-		SetTimer(hwnd, 1, 14,NULL);
+		frameCount = 0;
+		SetTimer(hwnd, 1, 100,NULL);
 		ZeroMemory(&ip, sizeof(ip));
 		break;
 	case WM_CHAR:
@@ -189,10 +218,20 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		BitBlt(bMemdc1, 0, 0, 600, 600, bMemdc2, screenX, screenY, SRCCOPY);
 			
 		wsprintf(pos, "player pos[ %d, %d ]", s->players[0].getPositionX(), s->players[0].getPositionY());
-		TextOut(hdc, 10, 660, ip, sizeof(ip));
-		TextOut(hdc, 10, 680, pos, sizeof(pos));
-		
-		
+		TextOut(hdc, 610, 10, ip, sizeof(ip));
+		TextOut(hdc, 610, 30, pos, sizeof(pos));
+		if(attackDown==s->players[0].getDebuff())
+			wsprintf(debuff, "Debuff[Attack 10% Down]");
+		if (dependDown == s->players[0].getDebuff())
+			wsprintf(debuff, "Debuff[Depend 10% Down]");
+		if (noBuff == s->players[0].getDebuff())
+			wsprintf(debuff, "Debuff[No DeBuff]");
+		TextOut(hdc, 610, 50, debuff, sizeof(debuff));
+		if (noBuff == s->players[0].getDebuff())
+			wsprintf(buff, "Debuff[No Buff]");
+		TextOut(hdc, 610, 70, buff, sizeof(buff));
+
+
 		//SetBkMode(bMemdc1, TRANSPARENT);
 		if (camaraPlayerX >= 300) 
 			camaraPlayerX = camaraPlayerX - (camaraPlayerX - 300);
@@ -210,13 +249,20 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		{
 			if (true == s->objects[m].isActive) {
 				if (Rabbit == s->objects[m].type) {
-					for (int i = 0; i < 4;++i)
-						drawBaby(bMemdc1, baby, s->objects[m].x - screenX, s->objects[m].y - screenY,0,i*40);
+					if(attackState==s->objects[m].state)
+						drawRabbit(bMemdc1, rabbit, s->objects[m].x - screenX, s->objects[m].y - screenY, frameCount * 30,0);
+					else
+						drawRabbitWait(bMemdc1, rabbit, s->objects[m].x - screenX, s->objects[m].y - screenY);
 				}
 				else
 					drawStone(bMemdc1, stone, s->objects[m].x - screenX, s->objects[m].y - screenY);
 			}
 		}
+
+		if (frameCount > 3)
+			frameCount = 0;
+		else
+			frameCount++;
 		//SelectObject(bMemdc3, oldBit3); DeleteDC(bMemdc3);
 		SelectObject(bMemdc2, oldBit2); DeleteDC(bMemdc2);
 		SelectObject(bMemdc1, oldBit1); DeleteDC(bMemdc1);

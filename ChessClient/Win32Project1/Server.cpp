@@ -110,6 +110,13 @@ void Server::ReadPacket()
 
 	}
 }
+void Server::requsetState()
+{
+	CsPacketLogin requset;
+	requset.packetSize = sizeof(CsPacketLogin);
+	requset.packetType = CS_STATE_UPDATE;
+	SendPacket(sock, &requset);
+}
 void Server::KeyDownAttack(WPARAM key)
 {
 	CsPacketLogin attack;
@@ -238,6 +245,7 @@ void Server::ProcessPacket(char* buf)
 				{
 					objects[i].x = pos->position.x;
 					objects[i].y = pos->position.y;
+					objects[i].state = pos->state;
 					break;
 				}
 			}
@@ -272,6 +280,23 @@ void Server::ProcessPacket(char* buf)
 				}
 			}
 		}
+		break;
+	}
+	case SC_BUFF:
+	{
+		ScPacketBuff *buff = reinterpret_cast<ScPacketBuff*>(buf);
+		for (auto i = 0; i < MAX_PLAYER; ++i)
+		{
+			if (buff->id == players[i].getID())
+			{
+				if (buff->buff == attackDown || buff->buff == dependDown)
+					players[i].setDebuff(buff->buff);
+				else
+					players[i].setBuff(buff->buff);
+				break;
+			}
+		}
+
 		break;
 	}
 	//스위치케이스문 끝나는 부분

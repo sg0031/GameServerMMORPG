@@ -8,7 +8,10 @@ enum buffType
 	noBuff=100,
 	attackUp,
 	speedUp,
-	dependUp
+	dependUp,
+	attackDown,
+	speedDown,
+	dependDown
 };
 enum MonsterState
 {

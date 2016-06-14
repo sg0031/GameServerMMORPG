@@ -23,6 +23,16 @@
 #define ARGO_START 2000
 #define BABY_START 2500
 
+enum buffType
+{
+	noBuff = 100,
+	attackUp,
+	speedUp,
+	dependUp,
+	attackDown,
+	speedDown,
+	dependDown
+};
 struct PlayerPosition
 {
 	int x;
@@ -41,6 +51,14 @@ struct CsPacketMove
 	BYTE packetType;
 	int id;
 };
+
+struct ScPacketBuff
+{
+	BYTE pakcetSize;
+	BYTE packetType;
+	int id;
+	int buff;
+};
 struct ScPacketPlayerPosition
 {
 	BYTE pakcetSize;
@@ -53,6 +71,7 @@ struct ScPacketMove
 	BYTE pakcetSize;
 	BYTE packetType;
 	int id;
+	int state;
 	PlayerPosition position;
 };
 struct ScPacketPutPlayer

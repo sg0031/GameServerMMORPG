@@ -20,8 +20,8 @@ Server::Server()
 		{
 			objects[i] = new Rabbit;
 
-			int x = rand() % 1960+40;
-			int y = rand() % 1960+40;
+			int x = (rand() % 1960)+40;
+			int y = (rand() % 1960)+40;
 			objects[i]->setID(i);
 			objects[i]->setPosX(x);
 			objects[i]->setPosY(y);
@@ -305,6 +305,7 @@ void Server::monsterProcessPacket(int id)
 	packet.packetType = SC_MOVE_POSITION;
 	packet.position.x = objects[id]->getPosX();
 	packet.position.y = objects[id]->getPosY();
+	packet.state = objects[id]->getState();
 
 	int startSectorX = (objects[id]->getPosX() / DIVDIE_SECTOR) - 1;
 	int startSectorY = (objects[id]->getPosY() / DIVDIE_SECTOR) - 1;
@@ -368,6 +369,8 @@ void Server::monsterProcessPacket(int id)
 }
 void Server::processPacket(int id, char *ptr, double deltaTime)
 {
+	int crushCount = 0;
+	int listSize = players[id].pObjectList.size();
 	switch (ptr[1])
 	{
 	case CS_LOGIN:
@@ -409,7 +412,13 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		pos.y = players[id].getPositionY();
 		if (pos.x + 1 > MAX_MAP_SIZE)
 			pos.x = MAX_MAP_SIZE;
-		pos = pos + (1 * dir);
+		//for (auto i : players[id].pObjectList) {
+		//	if (i < 1500) continue;
+		//	if (true == crushObject(id, i))
+		//		count++;
+		//}
+		//if(0==count)
+			pos = pos + (1 * dir);
 		players[id].setPositionX(pos.x);
 		players[id].setPositionY(pos.y);
 		break;
@@ -423,7 +432,13 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		pos.y = players[id].getPositionY();
 		if (pos.x - 1 < 0)
 			pos.x = 0;
-		pos = pos + (1 * dir);
+		//for (auto i : players[id].pObjectList) {
+		//	if (i < 1500) continue;
+		//	if (true == crushObject(id, i))
+		//		count++;
+		//}
+		//if (0 == count)
+			pos = pos + (1 * dir);
 		players[id].setPositionX(pos.x);
 		players[id].setPositionY(pos.y);
 		break;
@@ -437,7 +452,13 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		pos.y = players[id].getPositionY();
 		if (pos.y - 1 < 0)
 			pos.y = 0;
-		pos = pos + (1 * dir);
+		//for (auto i : players[id].pObjectList) {
+		//	if (i < 1500) continue;
+		//	if (true == crushObject(id, i))
+		//		count++;
+		//}
+		//if (0 == count)
+			pos = pos + (1 * dir);
 		players[id].setPositionX(pos.x);
 		players[id].setPositionY(pos.y);
 		break;
@@ -451,13 +472,20 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		pos.y = players[id].getPositionY();
 		if (pos.y + 1 > MAX_MAP_SIZE)
 			pos.y = MAX_MAP_SIZE;
-		pos = pos + (1 * dir);
+		//for (auto i : players[id].pObjectList) {
+		//	if (i < 1500) continue;
+		//	if (true == crushObject(id, i))
+		//		count++;
+		//}
+		//if (0 == count)
+			pos = pos + (1 * dir);
 		players[id].setPositionX(pos.x);
 		players[id].setPositionY(pos.y);
 		break;
 	}
 	case CS_ATTACK_A:
 	{
+		players[id].setState(attackPlayer);
 		players[id].pLock.lock();
 		for (auto i : players[id].pObjectList) {
 			if (true == attackCrushCheck(id, i)) {
@@ -507,6 +535,27 @@ bool Server::attackCrushCheck(int player, int monster)
 		return false;
 	}
 }
+bool Server::crushObject(int player, int monster)
+{
+	D3DXVECTOR2 pPos;
+	D3DXVECTOR2 monPos;
+	pPos.x = players[player].getPositionX();
+	pPos.y = players[player].getPositionY();
+	monPos.x = objects[monster]->getPosX();
+	monPos.y = objects[monster]->getPosY();
+	float dist = (monPos.x - pPos.x)
+		*(monPos.x - pPos.x)
+		+ (monPos.y - pPos.y)
+		* (monPos.y - pPos.y);
+	if (dist <= 20 * 20)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 void Server::updateSector(int id)
 {
 	int currX = players[id].getPositionX() / DIVDIE_SECTOR;
@@ -517,6 +566,22 @@ void Server::updateSector(int id)
 	if ((currX != predX) || (currY != predY)) //이전섹터와 같지 않으면
 	{
 		//std::cout << "변경" << std::endl;
+		if (100 == gameMap[currX][currY].debuff) {
+			players[id].setAttack(100);
+			players[id].setDepend(10);
+		}
+		else if (104 == gameMap[currX][currY].debuff) {
+			int decountattack = players[id].getAttack() * 0.1;
+			int attack = players[id].getAttack();
+			players[id].setAttack(attack - decountattack);
+		}
+		else if (106 == gameMap[currX][currY].debuff) {
+			int decount = players[id].getDepend() * 0.1;
+			int depend = players[id].getDepend();
+			players[id].setDepend(depend - decount);
+		}
+		//--------------------------------디버프 적용----------------------------
+		players[id].setDebuff(gameMap[currX][currY].debuff);
 		players[id].setPredSectorX(currX);
 		players[id].setPredSectorY(currY);
 		gameMap[currX][currY].sLock.lock();
@@ -534,6 +599,13 @@ void Server::updateSector(int id)
 			gameMap[predX][predY].sLock.unlock();
 		}
 		else gameMap[predX][predY].sLock.unlock();
+
+		ScPacketBuff buff;
+		buff.pakcetSize = sizeof(ScPacketBuff);
+		buff.packetType = SC_BUFF;
+		buff.id = id;
+		buff.buff = players[id].getDebuff();
+		sendPacket(id, &buff);
 	}
 }
 void Server::viewListUpdate(int id)

@@ -55,6 +55,13 @@ struct CsPacketAttack //플레이어가 공격버튼을 눌렀을때 보내는 패킷이다.
 	BYTE packetType;
 };
 
+struct ScPacketBuff
+{
+	BYTE pakcetSize;
+	BYTE packetType;
+	int id;
+	int buff;
+};
 
 struct ScPacketPlayerPosition
 {
@@ -68,6 +75,7 @@ struct ScPacketMove
 	BYTE pakcetSize;
 	BYTE packetType;
 	int id;
+	int state;
 	PlayerPosition position;
 };
 struct ScPacketPutPlayer

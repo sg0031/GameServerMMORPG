@@ -32,5 +32,6 @@ public:
 	void KeyDownAttack(WPARAM key);
 	void ProcessPacket(char* buf);
 	void SendPacket(SOCKET s, void* buf);
+	void requsetState();
 };
 

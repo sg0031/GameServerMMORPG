@@ -8,6 +8,9 @@ Player::Player()
 	id = -1;
 	x = -1;
 	y = -1;
+	state=waitPlayer;
+	mapDebuff=noBuff;
+	getBuff=noBuff;
 }
 
 
