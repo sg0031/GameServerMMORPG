@@ -1,6 +1,6 @@
 #pragma once
-#define PLAYER_START_POSX 4
-#define PLAYER_START_POSY 4
+#define PLAYER_START_POSX 260
+#define PLAYER_START_POSY 260
 #define PLAYER_INCREASE_HP 10 //퍼센트 단위
 #define MAX_HEALTH 1000
 

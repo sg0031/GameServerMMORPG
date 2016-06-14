@@ -246,7 +246,7 @@ void Server::ProcessPacket(char* buf)
 	}
 	case SC_REMOVE_PLAYER:
 	{
-		cout << "remove" << endl;
+		//cout << "remove" << endl;
 		ScPacketRemovePlayer *remove = reinterpret_cast<ScPacketRemovePlayer*>(buf);
 		if (remove->id < OBJECT_START)
 		{

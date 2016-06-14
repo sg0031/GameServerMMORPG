@@ -1,1 +1,13 @@
-﻿  Win32Project1.vcxproj -> E:\GameServerMMORPG\GameServerMMORPG\ChessClient\Debug\Win32Project1.exe
+﻿  stdafx.cpp
+  main.cpp
+d:\졸 업 작 품\servertermproject\gameservermmorpg\chessclient\win32project1\main.cpp(106): warning C4101: 'oldBrushBlack' :참조되지 않은 지역 변수입니다.
+d:\졸 업 작 품\servertermproject\gameservermmorpg\chessclient\win32project1\main.cpp(105): warning C4101: 'oldBrush' :참조되지 않은 지역 변수입니다.
+d:\졸 업 작 품\servertermproject\gameservermmorpg\chessclient\win32project1\main.cpp(106): warning C4101: 'hBrushBlack' :참조되지 않은 지역 변수입니다.
+d:\졸 업 작 품\servertermproject\gameservermmorpg\chessclient\win32project1\main.cpp(105): warning C4101: 'hBrush' :참조되지 않은 지역 변수입니다.
+  Server.cpp
+d:\졸 업 작 품\servertermproject\gameservermmorpg\chessclient\win32project1\server.cpp(91): warning C4018: '>=': signed 또는 unsigned가 일치하지 않습니다.
+d:\졸 업 작 품\servertermproject\gameservermmorpg\chessclient\win32project1\server.cpp(125): warning C4101: 'iobyte' :참조되지 않은 지역 변수입니다.
+  Player.cpp
+  GameBoard.cpp
+  코드를 생성하고 있습니다...
+  Win32Project1.vcxproj -> D:\졸 업 작 품\serverTermProject\GameServerMMORPG\ChessClient\Debug\Win32Project1.exe

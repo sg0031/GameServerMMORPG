@@ -20,8 +20,8 @@ Server::Server()
 		{
 			objects[i] = new Rabbit;
 
-			int x = rand() % 2000;
-			int y = rand() % 2000;
+			int x = rand() % 1960+40;
+			int y = rand() % 1960+40;
 			objects[i]->setID(i);
 			objects[i]->setPosX(x);
 			objects[i]->setPosY(y);
