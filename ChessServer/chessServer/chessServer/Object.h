@@ -47,6 +47,8 @@ protected:
 public:
 	Object() {};
 	~Object() {};
+	int getGold() { return level * 10; }
+
 	void setState(MonsterState st) { state = st; }
 	void responHP() { health = 100; }
 
@@ -74,7 +76,7 @@ public:
 	int getPosY() { return y; }
 	void setActive(int a) { active = a; }
 	bool getActive() { return active; }
-	int getExp() { return 5 * level; }
+	int getExp() { return 100 * level; }
 
 	int getState() { return state; }
 
@@ -86,6 +88,7 @@ public:
 	virtual void randomMove() {}; //랜덤하게 이동하는 메소드
 	virtual bool playerHit() { return false; }
 	virtual void decreaseHP(int attack) {};
+	virtual void setLevel(int) {  };
 };
 class Stone :public Object
 {
@@ -103,6 +106,7 @@ class Rabbit : public Object
 {
 public:
 	Rabbit() {
+		level = rand() % 10 + 5;
 		buff=noBuff;
 		type=PIECE_TYPE;
 		health=100;
@@ -110,7 +114,6 @@ public:
 		depend = 10;
 		acr=10;
 		exp=10;
-		level=10;
 		gold=10;
 		state=waitState;
 		setSpeed(2.0);
@@ -124,6 +127,7 @@ public:
 	virtual bool chaseRange();
 	virtual bool playerHit();
 	virtual void decreaseHP(int attack);
+	virtual void setLevel(int le) { level = le; };
 };
 //
 //class Baby : public Object

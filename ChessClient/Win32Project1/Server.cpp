@@ -329,6 +329,30 @@ void Server::ProcessPacket(char* buf)
 		}
 		break;
 	}
+	case SC_PLAYER_STATUS:
+	{
+		ScStatusInfo *stat = reinterpret_cast<ScStatusInfo*>(buf);
+		for (auto i = 0; i < MAX_PLAYER; ++i)
+		{
+			if (stat->id == players[i].getID())
+			{
+				players[i].setAttack(stat->attack); // 플레이어 공격력
+				players[i].setDepend(stat->depend); //플레이어 방어력
+				players[i].setMiss(stat->miss);//플레이어 회피력
+				players[i].setLevel(stat->level);//플레이어 레벨
+				players[i].setExp(stat->exp);//플레이어 경험치
+				players[i].setStr(stat->str);//플레이어 힘
+				players[i].setDex(stat->dex);//플레이어 민첩
+				players[i].setMental(stat->mental);//플레이어 지력
+				players[i].setGold(stat->gold);//플레이어의 보유중인 골드
+				players[i].setAcr(stat->acr); //플레이여 명중률
+				players[i].setMaxHP(stat->maxHealth);
+				players[i].setStatuCount(stat->statusCount);
+				break;
+			}
+		}
+		break;
+	}
 	//스위치케이스문 끝나는 부분
 	}
 }

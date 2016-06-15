@@ -285,10 +285,27 @@ void Server::workerThread()
 		{
 			int monID = static_cast<int>(objectId);
 			objects[monID]->responHP();
+			objects[monID]->setLevel(rand()%10+5);
 			objects[monID]->setState(waitState);
 			objects[monID]->setTarget(-1);
 			timer.AddGameEvent(MonsterUpdate, monID, 1000);
 			cout << monID << "부활" << endl;
+			delete over;
+		}
+		else if (over->operationType == playersHPincrease)
+		{
+			int ID = static_cast<int>(objectId);
+			players[ID].increaseHP();
+			ScPacketMove health;
+			health.pakcetSize = sizeof(ScPacketMove);
+			health.packetType = SC_STATE_UPDATE;
+			health.health = players[ID].getHp();
+			health.id = ID;
+			sendPacket(ID, &health);
+			if (0 != players[ID].pViewList.size())
+				for (auto i : players[ID].pViewList)
+					sendPacket(i, &health);
+			timer.AddGameEvent(playersHPincrease, id, 10000);
 			delete over;
 		}
 	}
@@ -371,10 +388,20 @@ void Server::monsterProcessPacket(int id)
 	for (auto i : nearList)
 		sendPacket(i, &packet);
 	if (0 != nearList.size()) {
-		if (deadState == objects[id]->getState())
+		if (deadState == objects[id]->getState()) {
+			ScPacketMove packet;
+			packet.pakcetSize = sizeof(ScPacketMove);
+			packet.id = id;
+			packet.packetType = SC_MOVE_POSITION;
+			packet.position.x = objects[id]->getPosX();
+			packet.position.y = objects[id]->getPosY();
+			packet.state = objects[id]->getState();
+			for (auto i : nearList)
+				sendPacket(i, &packet);
 			timer.AddGameEvent(MonsterRespon, id, 10000);
+		}
 		else
-			timer.AddGameEvent(MonsterUpdate, id, 1000);
+			timer.AddGameEvent(MonsterUpdate, id, 500);
 	}
 	else if (true == nearList.empty()) objects[id]->setActive(false);
 }
@@ -407,9 +434,12 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		login.position.x = players[id].getPositionX();
 		login.position.y = players[id].getPositionY();
 		sendPacket(id, &login);
+		sendPlayerStatus(id);
 
 		updateSector(id);
 		viewListUpdate(id);
+
+		timer.AddGameEvent(playersHPincrease, id, 5000);
 
 		break;
 	}
@@ -429,7 +459,7 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		//		count++;
 		//}
 		//if(0==count)
-		pos = pos + (1 * dir);
+		pos = pos + (MAX_SPEED * dir);
 		players[id].setPositionX(pos.x);
 		players[id].setPositionY(pos.y);
 		players[id].setState(walkPlayer);
@@ -450,7 +480,7 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		//		count++;
 		//}
 		//if (0 == count)
-		pos = pos + (1 * dir);
+		pos = pos + (MAX_SPEED * dir);
 		players[id].setPositionX(pos.x);
 		players[id].setPositionY(pos.y);
 		players[id].setState(walkPlayer);
@@ -471,7 +501,7 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		//		count++;
 		//}
 		//if (0 == count)
-		pos = pos + (1 * dir);
+		pos = pos + (MAX_SPEED * dir);
 		players[id].setPositionX(pos.x);
 		players[id].setPositionY(pos.y);
 		players[id].setState(walkPlayer);
@@ -492,7 +522,7 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		//		count++;
 		//}
 		//if (0 == count)
-		pos = pos + (1 * dir);
+		pos = pos + (MAX_SPEED * dir);
 		players[id].setPositionX(pos.x);
 		players[id].setPositionY(pos.y);
 		players[id].setState(walkPlayer);
@@ -505,9 +535,19 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		for (auto i : players[id].pObjectList) {
 			if (true == attackCrushCheck(id, i)) {
 				objects[i]->decreaseHP(players[id].getAttack());
+				if (deadState == objects[i]->getState()) {
+					players[id].increaseExp(objects[i]->getExp());
+					players[id].increaseGold(objects[i]->getGold());
+					_asm mfence;
+					objects[i]->setLevel(0);
+					if (true == players[id].levelUpcheck())
+						players[id].levelUp();
+				}
+
 			}
 		}
 		players[id].pLock.unlock();
+		sendPlayerStatus(id);
 		break;
 	}
 	case CS_STOP:
@@ -589,18 +629,20 @@ void Server::updateSector(int id)
 	{
 		//std::cout << "변경" << std::endl;
 		if (100 == gameMap[currX][currY].debuff) {
-			players[id].setAttack(100);
-			players[id].setDepend(10);
+			players[id].setMaxAttack();
+			players[id].setMaxDepend();
 		}
 		else if (104 == gameMap[currX][currY].debuff) {
 			int decountattack = players[id].getAttack() * 0.1;
 			int attack = players[id].getAttack();
 			players[id].setAttack(attack - decountattack);
+			players[id].setMaxDepend();
 		}
 		else if (106 == gameMap[currX][currY].debuff) {
 			int decount = players[id].getDepend() * 0.1;
 			int depend = players[id].getDepend();
 			players[id].setDepend(depend - decount);
+			players[id].setMaxAttack();
 		}
 		//--------------------------------디버프 적용----------------------------
 		players[id].setDebuff(gameMap[currX][currY].debuff);
@@ -628,6 +670,7 @@ void Server::updateSector(int id)
 		buff.id = id;
 		buff.buff = players[id].getDebuff();
 		sendPacket(id, &buff);
+		sendPlayerStatus(id);
 	}
 }
 void Server::viewListUpdate(int id)
@@ -825,6 +868,25 @@ void Server::viewListUpdate(int id)
 			sendPacket(i, &put);
 		}
 	}
+}
+void Server::sendPlayerStatus(int id) {
+	ScStatusInfo stat;
+	stat.packetType = SC_PLAYER_STATUS;
+	stat.pakcetSize = sizeof(ScStatusInfo);
+	stat.id = id;
+	stat.attack = players[id].getAttack();
+	stat.acr = players[id].getAcr();
+	stat.depend = players[id].getDepend();
+	stat.dex = players[id].getDex();
+	stat.gold = players[id].getGole();
+	stat.level = players[id].getLevel();
+	stat.maxHealth = players[id].getMaxHealth();
+	stat.mental = players[id].getMental();
+	stat.miss = players[id].getMiss();
+	stat.str = players[id].getStr();
+	stat.statusCount = players[id].getStatusCount();
+	stat.exp = players[id].getExp();
+	sendPacket(id, &stat);
 }
 void Server::sendPacket(int client, void* packet)
 {

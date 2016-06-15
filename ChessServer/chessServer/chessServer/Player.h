@@ -3,6 +3,8 @@
 #define PLAYER_START_POSY 4
 #define PLAYER_INCREASE_HP 10 //퍼센트 단위
 #define MAX_HEALTH 1000
+#define EXP 1000
+#define MAX_SPEED 2
 enum PlayerState
 {
 	waitPlayer = 300,
@@ -33,6 +35,9 @@ class Player
 	int animateState;
 	int playerBuff;
 	int playerDeBuff;
+	int maxHealth;
+	int maxAttack;
+	int maxDepend;
 public:
 	Player();
 	~Player();
@@ -41,6 +46,21 @@ public:
 	std::unordered_set<int> pObjectList; //플레이어 주위의 오브젝트 리스트
 	int viewList[MAX_PLAYER];
 	OverEx* overEx;
+	void setMaxAttack() { attack = maxAttack; }
+	void setMaxDepend() { depend = maxDepend; }
+
+	int getExp() { return exp; }
+	int getGole() { return gold; }
+	int getStr() { return str; }
+	int getDex() { return dex;}
+	int getAcr() { return acr; }
+	int getMental() { return mental; }
+	int getMiss() { return miss; }
+	int getStatusCount() { return statusCount; }
+	int getMaxHealth() { return maxHealth; }
+	int getLevel() { return level; }
+
+	bool levelUpcheck() { if (level*EXP <= exp) return true; else return false; }
 	void setDebuff(int de) { playerDeBuff = de; }
 	void setBuff(int bu) { playerBuff = bu; }
 	int getDebuff() { return playerDeBuff; }
@@ -66,9 +86,11 @@ public:
 	void increaseGold(int gol) { gold += gol; }
 	//레벨업시에 호출되는 메소드
 	void levelUp() {
+		level++;
 		exp = 0; 
 		statusCount++; 
-		health = MAX_HEALTH;
+		maxHealth = level*MAX_HEALTH;
+		health = maxHealth;
 	}
 	//스택선택시 상승 가능
 	void increaseMENTAL() { 
@@ -97,7 +119,9 @@ public:
 	}
 	//5초마다 회복될 플레이어 hp
 	void increaseHP() {
-		health = health + (health / PLAYER_INCREASE_HP); 
+		health = health + (health / PLAYER_INCREASE_HP);
+		if (maxHealth < health)
+			health = maxHealth;
 	}
 	//플레이어 경험치 획득시 사용될 메소드
 	void increaseExp(int ex) { exp += ex; }
@@ -118,6 +142,5 @@ public:
 	void moveDown() { x++; }
 	void moveRight() { y++; }
 	void moveLeft() { y--; }
-
 };
 

@@ -16,7 +16,28 @@ HBITMAP  bBitmap;
 int globalX;
 int globalY;
 Server *s = Server::getInstangce();
-
+void drawPlayer(HDC hdc, HBITMAP image, int posx, int posy,int sprightx)
+{
+	HDC MemDC;
+	HBITMAP OldBitmap;
+	MemDC = CreateCompatibleDC(hdc);
+	OldBitmap = (HBITMAP)SelectObject(MemDC, image);
+	TransparentBlt(hdc, posx, posy,
+		WIDTHRECTANGLE, HEIGHTRECTANGLE, MemDC, sprightx, 0, sprightx+40, 40, RGB(255, 255, 255));
+	SelectObject(MemDC, OldBitmap);
+	DeleteDC(MemDC);
+}
+void drawAttackPlayer(HDC hdc, HBITMAP image, int posx, int posy)
+{
+	HDC MemDC;
+	HBITMAP OldBitmap;
+	MemDC = CreateCompatibleDC(hdc);
+	OldBitmap = (HBITMAP)SelectObject(MemDC, image);
+	TransparentBlt(hdc, posx, posy,
+		WIDTHRECTANGLE, HEIGHTRECTANGLE, MemDC, 0, 0, 40, 40, RGB(255, 255, 255));
+	SelectObject(MemDC, OldBitmap);
+	DeleteDC(MemDC);
+}
 void drawObject(HDC hdc, HBITMAP image,int posx,int posy)
 {
 	HDC MemDC;
@@ -50,7 +71,7 @@ void drawBaby(HDC hdc, HBITMAP image, int posx, int posy,int sprightx,int sprigh
 	SelectObject(MemDC, OldBitmap);
 	DeleteDC(MemDC);
 }
-void drawRabbit(HDC hdc, HBITMAP image, int posx, int posy, int sprightx, int sprighty)
+void drawRabbitAttack(HDC hdc, HBITMAP image, int posx, int posy, int sprightx, int sprighty)
 {
 	HDC MemDC;
 	HBITMAP OldBitmap;
@@ -69,6 +90,17 @@ void drawRabbitWait(HDC hdc, HBITMAP image, int posx, int posy)
 	OldBitmap = (HBITMAP)SelectObject(MemDC, image);
 	TransparentBlt(hdc, posx, posy,
 		WIDTHRECTANGLE, HEIGHTRECTANGLE, MemDC, 0, 0, 40, 40, RGB(255, 255, 255));
+	SelectObject(MemDC, OldBitmap);
+	DeleteDC(MemDC);
+}
+void drawRabbitDead(HDC hdc, HBITMAP image, int posx, int posy)
+{
+	HDC MemDC;
+	HBITMAP OldBitmap;
+	MemDC = CreateCompatibleDC(hdc);
+	OldBitmap = (HBITMAP)SelectObject(MemDC, image);
+	TransparentBlt(hdc, posx, posy,
+		WIDTHRECTANGLE, HEIGHTRECTANGLE, MemDC, 0, 0, 0, 0, RGB(255, 255, 255));
 	SelectObject(MemDC, OldBitmap);
 	DeleteDC(MemDC);
 }
@@ -128,6 +160,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 	HBRUSH hBrushBlack, oldBrushBlack;
 	static HBITMAP chessPiece,skyMap,oldBit1,oldBit2,oldBit3;
 	static HBITMAP stone,baby,rabbit,argo,babyguard;
+	static HBITMAP player, attack, fireAttack, fireEffect;
 	static TCHAR ip[10];
 	static TCHAR pos[100];
 	static TCHAR debuff[100];
@@ -137,7 +170,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 	int camaraPlayerY;
 	int screenX;
 	int screenY;
-	static int frameCount;
+	static int frameCount,walkCount,effectCount;
 	
 	switch (iMsg)
 	{
@@ -166,6 +199,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		rabbit= LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BITMAP5));
 		argo= LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BITMAP6));
 		babyguard= LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BITMAP7));
+		player= LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BITMAP8));
+		attack= LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BITMAP9));
+		fireAttack= LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BITMAP10));
+		fireEffect= LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BITMAP11));
 		GetClientRect(hwnd, &crt);
 		count = 0;
 		camaraPlayerX = 0;
@@ -173,7 +210,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		screenX = 0;
 		screenY = 0;
 		frameCount = 0;
-		SetTimer(hwnd, 1, 100,NULL);
+		walkCount = 0;
+		effectCount = 0;
+		SetTimer(hwnd, 1, 14,NULL);
 		ZeroMemory(&ip, sizeof(ip));
 		break;
 	case WM_CHAR:
@@ -234,30 +273,67 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		if (noBuff == s->players[0].getDebuff())
 			wsprintf(buff, "Debuff[No Buff]");
 		TextOut(hdc, 610, 70, buff, lstrlen(buff));
-		wsprintf(s->players[0].strinHP, "Player HP : %d", s->players[0].getHp());
-		TextOut(hdc, 610,90, s->players[0].strinHP, lstrlen(s->players[0].strinHP));
+		wsprintf(s->players[0].strinHP, "[Player HP : %d/%d]", s->players[0].getHp(),s->players[0].getMaxHP());
+		TextOut(hdc, 610, 90, s->players[0].strinHP, lstrlen(s->players[0].strinHP));
+		
+		wsprintf(s->players[0].strinLevel, "[level:%d statusCount:%d]", s->players[0].getLevel(), s->players[0].getStatusCount());
+		TextOut(hdc, 610, 110, s->players[0].strinLevel, lstrlen(s->players[0].strinLevel));
 
+		wsprintf(s->players[0].strinAttack, "[attack:%d depend:%d]", s->players[0].getAttack(), s->players[0].getDepend());
+		TextOut(hdc, 610, 130, s->players[0].strinAttack, lstrlen(s->players[0].strinAttack));
 
+		wsprintf(s->players[0].strinExp, "[exp:%d gold:%d]", s->players[0].getExp(), s->players[0].getGold());
+		TextOut(hdc, 610, 150, s->players[0].strinExp, lstrlen(s->players[0].strinExp));
+
+		wsprintf(s->players[0].strinSTR, "[str:%d]", s->players[0].getStr());
+		TextOut(hdc, 610, 170, s->players[0].strinSTR, lstrlen(s->players[0].strinSTR));
+
+		wsprintf(s->players[0].strinDEX, "[dex:%d]", s->players[0].getDex());
+		TextOut(hdc, 610, 190, s->players[0].strinDEX, lstrlen(s->players[0].strinDEX));
+
+		wsprintf(s->players[0].strinMental, "[dex:%d]", s->players[0].getMental());
+		TextOut(hdc, 610, 210, s->players[0].strinMental, lstrlen(s->players[0].strinMental));
 		//SetBkMode(bMemdc1, TRANSPARENT);
 		if (camaraPlayerX >= 300) 
 			camaraPlayerX = camaraPlayerX - (camaraPlayerX - 300);
 		if(camaraPlayerY >= 300)
 			camaraPlayerY = camaraPlayerY - (camaraPlayerY - 300);
 	
-		drawObject(bMemdc1, chessPiece, camaraPlayerX, camaraPlayerY);
+		if(walkPlayer==s->players[0].getState())
+			drawPlayer(bMemdc1, player, camaraPlayerX, camaraPlayerY,walkCount*40);
+		if(waitPlayer == s->players[0].getState())
+			drawPlayer(bMemdc1, player, camaraPlayerX, camaraPlayerY, walkCount * 40);
+		if(attackPlayer==s->players[0].getState())
+			drawAttackPlayer(bMemdc1, attack, camaraPlayerX, camaraPlayerY);
+		else
+			drawPlayer(bMemdc1, player, camaraPlayerX, camaraPlayerY, walkCount * 40);
 		for (int p = 1; p < MAX_PLAYER; ++p)
 		{
 			if (true==s->players[p].getConnect())
 			{
-				drawObject(bMemdc1, chessPiece, s->players[p].getPositionX()- screenX, s->players[p].getPositionY()- screenY);
+				if(walkPlayer== s->players[p].getState())
+					drawPlayer(bMemdc1, player, s->players[p].getPositionX()- screenX, s->players[p].getPositionY()- screenY, walkCount*40);
+				if (waitPlayer == s->players[p].getState())
+					drawPlayer(bMemdc1, player, s->players[p].getPositionX() - screenX, s->players[p].getPositionY() - screenY, walkCount * 40);
+				if (attackPlayer == s->players[p].getState())
+					drawAttackPlayer(bMemdc1, attack, s->players[p].getPositionX() - screenX, s->players[p].getPositionY() - screenY);
+				else
+					drawPlayer(bMemdc1, player, s->players[p].getPositionX() - screenX, s->players[p].getPositionY() - screenY, walkCount * 40);
 			}
 		}
 		for (int m = 0; m < MAX_OBJECT; ++m)
 		{
 			if (true == s->objects[m].isActive) {
 				if (Rabbit == s->objects[m].type) {
-					if(attackState==s->objects[m].state)
-						drawRabbit(bMemdc1, rabbit, s->objects[m].x - screenX, s->objects[m].y - screenY, frameCount * 30,0);
+					if (attackState == s->objects[m].state) {
+						drawRabbitAttack(bMemdc1, rabbit, s->objects[m].x - screenX, s->objects[m].y - screenY, frameCount * 40, 0);
+						if (frameCount > 3)
+							frameCount = 0;
+						else
+							frameCount++;
+					}
+					if(deadState==s->objects[m].state)
+						drawRabbitDead(bMemdc1, rabbit, s->objects[m].x - screenX, s->objects[m].y - screenY);
 					else
 						drawRabbitWait(bMemdc1, rabbit, s->objects[m].x - screenX, s->objects[m].y - screenY);
 				}
@@ -266,10 +342,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 			}
 		}
 
-		if (frameCount > 3)
-			frameCount = 0;
-		else
-			frameCount++;
+
 		//SelectObject(bMemdc3, oldBit3); DeleteDC(bMemdc3);
 		SelectObject(bMemdc2, oldBit2); DeleteDC(bMemdc2);
 		SelectObject(bMemdc1, oldBit1); DeleteDC(bMemdc1);
@@ -310,7 +383,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		oldBit1 = (HBITMAP)SelectObject(bMemdc1, bBitmap);
 		// mem1dc에 있는 내용을 hdc에 뿌려준다.
 		BitBlt(hdc, 0, 0,600,600, bMemdc1, 0, 0, SRCCOPY);
-
 		SelectObject(bMemdc1, oldBit1);
 		DeleteDC(bMemdc2);
 		//DeleteDC(bMemdc3);

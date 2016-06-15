@@ -81,5 +81,17 @@
     <Image Include="..\babyguard.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
+    <Image Include="..\charecter.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\basicAttack.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\fireskill.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\fire.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
   </ItemGroup>
 </Project>

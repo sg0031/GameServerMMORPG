@@ -172,7 +172,11 @@
     <Image Include="..\argo.bmp" />
     <Image Include="..\baby.bmp" />
     <Image Include="..\babyguard.bmp" />
+    <Image Include="..\basicAttack.bmp" />
+    <Image Include="..\charecter.bmp" />
     <Image Include="..\ChessPiece.bmp" />
+    <Image Include="..\fire.bmp" />
+    <Image Include="..\fireskill.bmp" />
     <Image Include="..\Rabbit.bmp" />
     <Image Include="..\sky.bmp" />
     <Image Include="..\stone.bmp" />

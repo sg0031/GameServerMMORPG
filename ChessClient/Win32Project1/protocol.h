@@ -59,6 +59,24 @@ struct ScPacketBuff
 	int id;
 	int buff;
 };
+struct ScStatusInfo
+{
+	BYTE pakcetSize;
+	BYTE packetType;
+	int id;
+	int attack; // 플레이어 공격력
+	int depend; //플레이어 방어력
+	int miss;//플레이어 회피력
+	int level;//플레이어 레벨
+	int exp;//플레이어 경험치
+	int str;//플레이어 힘
+	int dex;//플레이어 민첩
+	int mental;//플레이어 지력
+	int gold;//플레이어의 보유중인 골드
+	int acr; //플레이여 명중률
+	int maxHealth;
+	int statusCount;
+};
 struct ScPacketPlayerPosition
 {
 	BYTE pakcetSize;

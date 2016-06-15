@@ -9,7 +9,9 @@ Player::Player()
 	x = PLAYER_START_POSX;
 	y = PLAYER_START_POSY;
 	attack=100; // 플레이어 공격력
+	maxAttack = 100;
 	depend=10; //플레이어 방어력
+	maxDepend = 10;
 	miss=10;//플레이어 회피력
 	level=1;//플레이어 레벨
 	exp=0;//플레이어 경험치
@@ -18,6 +20,7 @@ Player::Player()
 	mental=0;//플레이어 지력
 	gold=0;//플레이어의 보유중인 골드
 	health=MAX_HEALTH; //플레이어 체력
+	maxHealth = MAX_HEALTH;
 	acr=10; //플레이여 명중률
 	statusCount=0; //레벨업시에 남아있는
 

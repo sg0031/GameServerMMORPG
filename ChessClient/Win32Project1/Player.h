@@ -9,20 +9,9 @@ enum MonsterState
 };
 enum PlayerState
 {
-	leftWaitPlayer=300,
-	rightWaitPlayer,
-	upWaitPlayer,
-	downWaitPlayer,
-	waitPlayer,
+	waitPlayer = 300,
 	attackPlayer,
-	leftAttackPlayer,
-	rightAttackPlayer,
-	upAttackPlayer,
-	downAttackPlayer,
-	leftWalkPlayer,
-	rightWalkPlayer,
-	upWalkPlayer,
-	downWalkPlayer,
+	walkPlayer,
 	deadPlayer
 };
 struct Object
@@ -52,8 +41,58 @@ class Player
 	int mapDebuff;
 	int getBuff;
 	int health;
+
+	int attack; // 플레이어 공격력
+	int depend; //플레이어 방어력
+	int miss;//플레이어 회피력
+	int level;//플레이어 레벨
+	int exp;//플레이어 경험치
+	int str;//플레이어 힘
+	int dex;//플레이어 민첩
+	int mental;//플레이어 지력
+	int gold;//플레이어의 보유중인 골드
+	int acr; //플레이여 명중률
+	int maxHealth;
+	int statusCount;
 public:
 	TCHAR strinHP[100];
+	TCHAR strinMaxHP[100];
+	TCHAR strinAttack[10];
+	TCHAR strinDepend[10];
+	TCHAR strinMiss[10];
+	TCHAR strinExp[10];
+	TCHAR strinSTR[10];
+	TCHAR strinDEX[10];
+	TCHAR strinMental[10];
+	TCHAR strinGold[10];
+	TCHAR strinAcr[10];
+	TCHAR strinLevel[100];
+
+	void setStatuCount(int st) { statusCount = st; }
+	int getStatusCount() { return statusCount; }
+	void setAttack(int Attack) { attack = Attack; }
+	int getAttack() { return attack; }
+	void setDepend(int de) { depend = de; }
+	int getDepend() { return depend; }
+	void setMiss(int mis) { miss = mis; }
+	int getMiss() { return miss; }
+	void setLevel(int le) { level = le; }
+	int getLevel() { return level; }
+	void setExp(int ex) { exp = ex; }
+	int getExp() { return exp; }
+	void setStr(int st) { str = st; }
+	int getStr() { return str; }
+	void setDex(int de) { dex = de; }
+	int getDex() { return dex; }
+	void setMental(int men) { mental = men; }
+	int getMental() { return mental; }
+	void setGold(int go) { gold = go; }
+	int getGold() { return gold; }
+	void setAcr(int ac) { acr = ac; }
+	int getAcr() { return acr; }
+	void setMaxHP(int hp) { maxHealth = hp; }
+	int getMaxHP() { return maxHealth; }
+
 	void setHP(int hp) { health = hp; }
 	int getHp() { return health; }
 	void setDebuff(int de) { mapDebuff = de; }

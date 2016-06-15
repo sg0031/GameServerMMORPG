@@ -8,7 +8,8 @@ enum EOperationType
 	Sendtype = 1,
 	Recvtype = 2,
 	MonsterUpdate,
-	MonsterRespon
+	MonsterRespon,
+	playersHPincrease
 };
 struct OverEx	//오버렙트구조체 확장
 {
@@ -38,6 +39,7 @@ enum
 	SC_SET_PLAYER,
 	SC_REMOVE_PLAYER,
 	SC_BUFF,
-	SC_STATE_UPDATE
+	SC_STATE_UPDATE,
+	SC_PLAYER_STATUS
 
 };
