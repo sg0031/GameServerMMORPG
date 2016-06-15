@@ -96,7 +96,9 @@ public:
 		exp = exp / 2;
 	}
 	//5초마다 회복될 플레이어 hp
-	void increaseHP() { health = health + (health / PLAYER_INCREASE_HP); }
+	void increaseHP() {
+		health = health + (health / PLAYER_INCREASE_HP); 
+	}
 	//플레이어 경험치 획득시 사용될 메소드
 	void increaseExp(int ex) { exp += ex; }
 

@@ -1,2 +1,2 @@
-﻿  건너뛰고 있습니다... (관련된 변경 내용 없음)
-  Object.cpp
+﻿  stdafx.cpp
+d:\졸 업 작 품\servertermproject\gameservermmorpg\chessserver\chessserver\chessserver\stdafx.h(21): fatal error C1083: 포함 파일을 열 수 없습니다. 'D3DX10Math.h': No such file or directory

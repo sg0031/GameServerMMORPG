@@ -76,6 +76,7 @@ struct ScPacketMove
 	BYTE packetType;
 	int id;
 	int state;
+	int health;
 	PlayerPosition position;
 };
 struct ScPacketPutPlayer
@@ -83,6 +84,8 @@ struct ScPacketPutPlayer
 	BYTE packetSize;
 	BYTE packetType;
 	int id;
+	int state;
+	int health;
 	PlayerPosition position;
 };
 struct ScPacketRemovePlayer

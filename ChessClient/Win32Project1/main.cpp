@@ -128,10 +128,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 	HBRUSH hBrushBlack, oldBrushBlack;
 	static HBITMAP chessPiece,skyMap,oldBit1,oldBit2,oldBit3;
 	static HBITMAP stone,baby,rabbit,argo,babyguard;
-	static char ip[10];
-	static char pos[30];
-	static char debuff[100];
-	static char buff[100];
+	static TCHAR ip[10];
+	static TCHAR pos[100];
+	static TCHAR debuff[100];
+	static TCHAR buff[100];
 	static int count;
 	int camaraPlayerX;
 	int camaraPlayerY;
@@ -196,6 +196,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		if (wParam == 'A')
 			s->KeyDownAttack(wParam);
 		break;
+	case WM_KEYUP:
+		s->KeyUp();
+		break;
 	case WM_TIMER:
 		//더블버퍼링---------------------------------
 		hdc = GetDC(hwnd);
@@ -211,25 +214,28 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		camaraPlayerY = s->players[0].getPositionY();
 		screenX = 0;
 		screenY = 0;
+
 		if (camaraPlayerX >= 300)
 			screenX = camaraPlayerX - 300;
 		if (camaraPlayerY >= 300)
 			screenY = camaraPlayerY - 300;
 		BitBlt(bMemdc1, 0, 0, 600, 600, bMemdc2, screenX, screenY, SRCCOPY);
 			
-		wsprintf(pos, "player pos[ %d, %d ]", s->players[0].getPositionX(), s->players[0].getPositionY());
-		TextOut(hdc, 610, 10, ip, sizeof(ip));
-		TextOut(hdc, 610, 30, pos, sizeof(pos));
+		TextOut(hdc, 610, 10, ip, lstrlen(ip));
+		wsprintf(pos, TEXT("player pos[ %d, %d ]"), s->players[0].getPositionX(), s->players[0].getPositionY());
+		TextOut(hdc, 610, 30, pos, lstrlen(pos));
 		if(attackDown==s->players[0].getDebuff())
 			wsprintf(debuff, "Debuff[Attack 10% Down]");
 		if (dependDown == s->players[0].getDebuff())
 			wsprintf(debuff, "Debuff[Depend 10% Down]");
 		if (noBuff == s->players[0].getDebuff())
 			wsprintf(debuff, "Debuff[No DeBuff]");
-		TextOut(hdc, 610, 50, debuff, sizeof(debuff));
+		TextOut(hdc, 610, 50, debuff, lstrlen(debuff));
 		if (noBuff == s->players[0].getDebuff())
 			wsprintf(buff, "Debuff[No Buff]");
-		TextOut(hdc, 610, 70, buff, sizeof(buff));
+		TextOut(hdc, 610, 70, buff, lstrlen(buff));
+		wsprintf(s->players[0].strinHP, "Player HP : %d", s->players[0].getHp());
+		TextOut(hdc, 610,90, s->players[0].strinHP, lstrlen(s->players[0].strinHP));
 
 
 		//SetBkMode(bMemdc1, TRANSPARENT);
@@ -237,6 +243,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 			camaraPlayerX = camaraPlayerX - (camaraPlayerX - 300);
 		if(camaraPlayerY >= 300)
 			camaraPlayerY = camaraPlayerY - (camaraPlayerY - 300);
+	
 		drawObject(bMemdc1, chessPiece, camaraPlayerX, camaraPlayerY);
 		for (int p = 1; p < MAX_PLAYER; ++p)
 		{

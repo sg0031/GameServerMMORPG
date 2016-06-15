@@ -51,7 +51,11 @@ class Player
 	int state;
 	int mapDebuff;
 	int getBuff;
+	int health;
 public:
+	TCHAR strinHP[100];
+	void setHP(int hp) { health = hp; }
+	int getHp() { return health; }
 	void setDebuff(int de) { mapDebuff = de; }
 	void setBuff(int bu) { getBuff = bu; }
 	int getDebuff() { return mapDebuff; }

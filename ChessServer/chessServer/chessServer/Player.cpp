@@ -21,6 +21,7 @@ Player::Player()
 	acr=10; //플레이여 명중률
 	statusCount=0; //레벨업시에 남아있는
 
+	animateState = waitState;
 	pViewList.clear();
 	pObjectList.clear();
 

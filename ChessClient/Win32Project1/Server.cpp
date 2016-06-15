@@ -117,6 +117,13 @@ void Server::requsetState()
 	requset.packetType = CS_STATE_UPDATE;
 	SendPacket(sock, &requset);
 }
+void Server::KeyUp()
+{
+	CsPacketLogin keyup;
+	keyup.packetSize = sizeof(CsPacketLogin);
+	keyup.packetType = CS_STOP;
+	SendPacket(sock, &keyup);
+}
 void Server::KeyDownAttack(WPARAM key)
 {
 	CsPacketLogin attack;
@@ -193,6 +200,8 @@ void Server::ProcessPacket(char* buf)
 					players[i].setID(position->id);
 					players[i].setPositionX(position->position.x);
 					players[i].setPositionY(position->position.y);
+					players[i].setHP(position->health);
+					players[i].setState(position->state);
 					players[i].setConnect(true);
 					break;
 				}
@@ -200,6 +209,8 @@ void Server::ProcessPacket(char* buf)
 				{
 					players[i].setPositionX(position->position.x);
 					players[i].setPositionY(position->position.y);
+					players[i].setHP(position->health);
+					players[i].setState(position->state);
 					players[i].setConnect(true);
 					break;
 				}
@@ -213,6 +224,8 @@ void Server::ProcessPacket(char* buf)
 				{
 					objects[i].x = position->position.x;
 					objects[i].y = position->position.y;
+					objects[i].health = position->health;
+					objects[i].state = position->state;
 					objects[i].isActive = true;
 					break;
 				}
@@ -233,6 +246,8 @@ void Server::ProcessPacket(char* buf)
 				{
 					players[i].setPositionX(pos->position.x);
 					players[i].setPositionY(pos->position.y);
+					players[i].setHP(pos->health);
+					players[i].setState(pos->state);
 					break;
 				}
 			}
@@ -245,6 +260,7 @@ void Server::ProcessPacket(char* buf)
 				{
 					objects[i].x = pos->position.x;
 					objects[i].y = pos->position.y;
+					objects[i].health = pos->health;
 					objects[i].state = pos->state;
 					break;
 				}
@@ -297,6 +313,20 @@ void Server::ProcessPacket(char* buf)
 			}
 		}
 
+		break;
+	}
+	case SC_STATE_UPDATE:
+	{
+		ScPacketMove *state = reinterpret_cast<ScPacketMove*>(buf);
+		for (auto i = 0; i < MAX_PLAYER; ++i)
+		{
+			if (state->id == players[i].getID())
+			{
+				players[i].setHP(state->health);
+				players[i].setState(state->state);
+				break;
+			}
+		}
 		break;
 	}
 	//스위치케이스문 끝나는 부분

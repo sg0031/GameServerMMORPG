@@ -355,8 +355,19 @@ void Server::monsterProcessPacket(int id)
 		objects[id]->setTagetPos(targetPos.x, targetPos.y);
 	}
 	objects[id]->upDate();
-	if (true == objects[id]->hitDamge() && deadState!=objects[id]->getState())
+	if (true == objects[id]->hitDamge() && deadState != objects[id]->getState()) {
+		//플레이어가 몬스터한테맞았을떄 hp를 뿌려줌
 		players[objects[id]->getTarget()].decreaseHP(objects[id]->getAttack());
+		ScPacketMove health;
+		health.pakcetSize = sizeof(ScPacketMove);
+		health.packetType = SC_STATE_UPDATE;
+		health.health = players[objects[id]->getTarget()].getHp();
+		health.id = objects[id]->getTarget();
+		sendPacket(objects[id]->getTarget(), &health);
+		if(0!=players[objects[id]->getTarget()].pViewList.size())
+			for(auto i: players[objects[id]->getTarget()].pViewList)
+				sendPacket(i, &health);
+	}
 	for (auto i : nearList)
 		sendPacket(i, &packet);
 	if (0 != nearList.size()) {
@@ -418,9 +429,10 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		//		count++;
 		//}
 		//if(0==count)
-			pos = pos + (1 * dir);
+		pos = pos + (1 * dir);
 		players[id].setPositionX(pos.x);
 		players[id].setPositionY(pos.y);
+		players[id].setState(walkPlayer);
 		break;
 	}
 	case CS_LEFT:
@@ -438,9 +450,10 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		//		count++;
 		//}
 		//if (0 == count)
-			pos = pos + (1 * dir);
+		pos = pos + (1 * dir);
 		players[id].setPositionX(pos.x);
 		players[id].setPositionY(pos.y);
+		players[id].setState(walkPlayer);
 		break;
 	}
 	case CS_UP:
@@ -458,9 +471,10 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		//		count++;
 		//}
 		//if (0 == count)
-			pos = pos + (1 * dir);
+		pos = pos + (1 * dir);
 		players[id].setPositionX(pos.x);
 		players[id].setPositionY(pos.y);
+		players[id].setState(walkPlayer);
 		break;
 	}
 	case CS_DOWN:
@@ -478,9 +492,10 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		//		count++;
 		//}
 		//if (0 == count)
-			pos = pos + (1 * dir);
+		pos = pos + (1 * dir);
 		players[id].setPositionX(pos.x);
 		players[id].setPositionY(pos.y);
+		players[id].setState(walkPlayer);
 		break;
 	}
 	case CS_ATTACK_A:
@@ -495,6 +510,11 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		players[id].pLock.unlock();
 		break;
 	}
+	case CS_STOP:
+	{
+		players[id].setState(waitPlayer);
+		break;
+	}
 
 	}
 	//매번 플레이어들의 위치값 갱신
@@ -502,6 +522,8 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 	packet.pakcetSize = sizeof(ScPacketMove);
 	packet.id = players[id].getID();
 	packet.packetType = SC_MOVE_POSITION;
+	packet.health = players[id].getHp();
+	packet.state = players[id].getState();
 	packet.position.x = players[id].getPositionX();
 	packet.position.y = players[id].getPositionY();
 	sendPacket(id, &packet);
@@ -773,6 +795,7 @@ void Server::viewListUpdate(int id)
 			put.id = i;
 			put.position.x = objects[i]->getPosX();
 			put.position.y = objects[i]->getPosY();
+			put.state = objects[i]->getState();
 			sendPacket(id, &put);
 		}
 		else				//플레이어의 경우
@@ -780,6 +803,8 @@ void Server::viewListUpdate(int id)
 			put.id = i;
 			put.position.x = players[i].getPositionX();
 			put.position.y = players[i].getPositionY();
+			put.health = players[i].getHp();
+			put.state = players[i].getState();
 			sendPacket(id, &put);
 		}
 	}
@@ -793,8 +818,10 @@ void Server::viewListUpdate(int id)
 		else
 		{
 			put.id = id;
-			put.position.x = players[i].getPositionX();
-			put.position.y = players[i].getPositionY();
+			put.position.x = players[id].getPositionX();
+			put.position.y = players[id].getPositionY();
+			put.health = players[id].getHp();
+			put.state = players[id].getState();
 			sendPacket(i, &put);
 		}
 	}
