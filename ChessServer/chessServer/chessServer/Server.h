@@ -21,6 +21,7 @@ public:
 	static void updateSector(int id);
 	static void monsterProcessPacket(int id);
 	static bool attackCrushCheck(int player, int monster);
+	static bool fireAttackCheck(int id, int Mon);
 	static bool crushObject(int player, int object);
 	static void sendPlayerStatus(int id);
 };

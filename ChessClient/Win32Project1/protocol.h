@@ -38,7 +38,11 @@ struct PlayerPosition
 	int x;
 	int y;
 };
-
+struct CsPacketChat {
+	BYTE size;
+	BYTE type;
+	WCHAR message[100];
+};
 struct CsPacketLogin
 {
 	BYTE packetSize;
@@ -108,3 +112,10 @@ struct ScPacketRemovePlayer
 	BYTE packetType;
 	int id;
 };
+struct ScPacketChat {
+	BYTE size;
+	BYTE type;
+	int id;
+	WCHAR message[100];
+};
+

@@ -38,6 +38,17 @@ void drawAttackPlayer(HDC hdc, HBITMAP image, int posx, int posy)
 	SelectObject(MemDC, OldBitmap);
 	DeleteDC(MemDC);
 }
+void drawEffect(HDC hdc, HBITMAP image, int posx, int posy)
+{
+	HDC MemDC;
+	HBITMAP OldBitmap;
+	MemDC = CreateCompatibleDC(hdc);
+	OldBitmap = (HBITMAP)SelectObject(MemDC, image);
+	TransparentBlt(hdc, posx-20, posy-20,
+		100, 100, MemDC, 0, 0, 200, 200, RGB(255, 255, 255));
+	SelectObject(MemDC, OldBitmap);
+	DeleteDC(MemDC);
+}
 void drawObject(HDC hdc, HBITMAP image,int posx,int posy)
 {
 	HDC MemDC;
@@ -158,6 +169,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 	PAINTSTRUCT ps;
 	HBRUSH hBrush, oldBrush;
 	HBRUSH hBrushBlack, oldBrushBlack;
+	static bool connectIp,chatEnterFlag;
 	static HBITMAP chessPiece,skyMap,oldBit1,oldBit2,oldBit3;
 	static HBITMAP stone,baby,rabbit,argo,babyguard;
 	static HBITMAP player, attack, fireAttack, fireEffect;
@@ -165,7 +177,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 	static TCHAR pos[100];
 	static TCHAR debuff[100];
 	static TCHAR buff[100];
+	static TCHAR chatWindow[6][100];//채팅창
+	static int chatLine, chatCount;
+	static TCHAR myChatString[100];//내가 입력하는 글씨
+	static TCHAR myViewString[100];
+	static int myCharCount;
 	static int count;
+	static int printLine;
 	int camaraPlayerX;
 	int camaraPlayerY;
 	int screenX;
@@ -192,6 +210,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		break;
 	}
 	case WM_CREATE:
+		printLine = 1;
+		chatLine = 0;
+		chatCount = 0;
+		myCharCount = 0;
+		CreateCaret(hWnd, NULL, 10, 10);
+		SetCaretPos(700, 10);
+		chatEnterFlag = false;
+		connectIp = false;
 		chessPiece = LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BITMAP1));
 		skyMap = LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BITMAP2));
 		stone= LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BITMAP3));
@@ -216,23 +242,54 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		ZeroMemory(&ip, sizeof(ip));
 		break;
 	case WM_CHAR:
-		if(wParam==VK_RETURN)
-			s->socketinit(ip);
-		if (wParam == VK_BACK)
+		if (wParam == VK_RETURN &&chatEnterFlag == false && connectIp == true)
+		{
+			chatEnterFlag = true;
+		}
+		else if (chatEnterFlag == true)
+		{
+			if (wParam == VK_BACK) {
+				myCharCount--;
+				if (myCharCount < 0)
+					myCharCount = 0;
+				myChatString[myCharCount] = NULL;
+			}
+			else if (wParam == VK_RETURN) {
+				ZeroMemory(&chatWindow[s->chatLine],100);
+				wsprintf(myViewString, TEXT("%d : %s"), s->players[0].getID(), myChatString);
+				memcpy(&chatWindow[s->chatLine], &myViewString, sizeof(myViewString));
+				chatEnterFlag = false;
+				if (s->chatLine >= 5)
+					s->chatLine = 0;
+				else
+					s->chatLine++;
+				myCharCount = 0;
+				ZeroMemory(&myChatString, sizeof(myChatString));
+			}
+			else
+				myChatString[myCharCount++] = (TCHAR)wParam;
+		}
+		InvalidateRect(hwnd, NULL, true);
+		break;
+	case WM_KEYDOWN:
+		if (wParam == VK_RETURN && connectIp == false) {
+			s->socketinit(ip); connectIp = true;
+		}
+		if (wParam == VK_BACK&& connectIp == false)
 		{
 			count--;
 			if (count < 0)
 				count = 0;
 			ip[count] = NULL;
 		}
-		else
+		if(connectIp ==false){
 			ip[count++] = (TCHAR)wParam;
-		InvalidateRect(hwnd, NULL, TRUE);
-		break;
-	case WM_KEYDOWN:
+		}
 		if(wParam==VK_LEFT || wParam==VK_RIGHT || wParam==VK_UP || wParam==VK_DOWN)
 			s->KeyDown(wParam);
-		if (wParam == 'A')
+		if (wParam == 'A' && chatEnterFlag==false)
+			s->KeyDownAttack(wParam);
+		if (wParam == 'Q'&& chatEnterFlag==false)
 			s->KeyDownAttack(wParam);
 		break;
 	case WM_KEYUP:
@@ -242,7 +299,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		//더블버퍼링---------------------------------
 		hdc = GetDC(hwnd);
 		if (bBitmap == NULL)
-			bBitmap = CreateCompatibleBitmap(hdc, 600, 600);
+			bBitmap = CreateCompatibleBitmap(hdc, 500, 500);
 		bMemdc1 = CreateCompatibleDC(hdc);
 		bMemdc2 = CreateCompatibleDC(bMemdc1);
 		//bMemdc3 = CreateCompatibleDC(bMemdc2);
@@ -254,50 +311,56 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		screenX = 0;
 		screenY = 0;
 
-		if (camaraPlayerX >= 300)
-			screenX = camaraPlayerX - 300;
-		if (camaraPlayerY >= 300)
-			screenY = camaraPlayerY - 300;
-		BitBlt(bMemdc1, 0, 0, 600, 600, bMemdc2, screenX, screenY, SRCCOPY);
-			
-		TextOut(hdc, 610, 10, ip, lstrlen(ip));
+		if (camaraPlayerX >= 250)
+			screenX = camaraPlayerX - 250;
+		if (camaraPlayerY >= 250)
+			screenY = camaraPlayerY - 250;
+		BitBlt(bMemdc1, 0, 0, 500, 500, bMemdc2, screenX, screenY, SRCCOPY);
+		for (auto i = 5; i >=0; --i)
+		{
+			TextOut(hdc, 10, 510+ (printLine*20), chatWindow[i], lstrlen(chatWindow[i]));
+			printLine++;
+		}
+		printLine = 1;
+		TextOut(hdc, 10,510, myChatString, lstrlen(myChatString));
+		TextOut(hdc, 510, 10, ip, lstrlen(ip));
 		wsprintf(pos, TEXT("player pos[ %d, %d ]"), s->players[0].getPositionX(), s->players[0].getPositionY());
-		TextOut(hdc, 610, 30, pos, lstrlen(pos));
+		TextOut(hdc, 510, 30, pos, lstrlen(pos));
 		if(attackDown==s->players[0].getDebuff())
 			wsprintf(debuff, "Debuff[Attack 10% Down]");
 		if (dependDown == s->players[0].getDebuff())
 			wsprintf(debuff, "Debuff[Depend 10% Down]");
 		if (noBuff == s->players[0].getDebuff())
 			wsprintf(debuff, "Debuff[No DeBuff]");
-		TextOut(hdc, 610, 50, debuff, lstrlen(debuff));
+		TextOut(hdc, 510, 50, debuff, lstrlen(debuff));
 		if (noBuff == s->players[0].getDebuff())
 			wsprintf(buff, "Debuff[No Buff]");
-		TextOut(hdc, 610, 70, buff, lstrlen(buff));
+		TextOut(hdc, 510, 70, buff, lstrlen(buff));
 		wsprintf(s->players[0].strinHP, "[Player HP : %d/%d]", s->players[0].getHp(),s->players[0].getMaxHP());
-		TextOut(hdc, 610, 90, s->players[0].strinHP, lstrlen(s->players[0].strinHP));
+		TextOut(hdc, 510, 90, s->players[0].strinHP, lstrlen(s->players[0].strinHP));
 		
 		wsprintf(s->players[0].strinLevel, "[level:%d statusCount:%d]", s->players[0].getLevel(), s->players[0].getStatusCount());
-		TextOut(hdc, 610, 110, s->players[0].strinLevel, lstrlen(s->players[0].strinLevel));
+		TextOut(hdc, 510, 110, s->players[0].strinLevel, lstrlen(s->players[0].strinLevel));
 
 		wsprintf(s->players[0].strinAttack, "[attack:%d depend:%d]", s->players[0].getAttack(), s->players[0].getDepend());
-		TextOut(hdc, 610, 130, s->players[0].strinAttack, lstrlen(s->players[0].strinAttack));
+		TextOut(hdc, 510, 130, s->players[0].strinAttack, lstrlen(s->players[0].strinAttack));
 
 		wsprintf(s->players[0].strinExp, "[exp:%d gold:%d]", s->players[0].getExp(), s->players[0].getGold());
-		TextOut(hdc, 610, 150, s->players[0].strinExp, lstrlen(s->players[0].strinExp));
+		TextOut(hdc, 510, 150, s->players[0].strinExp, lstrlen(s->players[0].strinExp));
 
 		wsprintf(s->players[0].strinSTR, "[str:%d]", s->players[0].getStr());
-		TextOut(hdc, 610, 170, s->players[0].strinSTR, lstrlen(s->players[0].strinSTR));
+		TextOut(hdc, 510, 170, s->players[0].strinSTR, lstrlen(s->players[0].strinSTR));
 
 		wsprintf(s->players[0].strinDEX, "[dex:%d]", s->players[0].getDex());
-		TextOut(hdc, 610, 190, s->players[0].strinDEX, lstrlen(s->players[0].strinDEX));
+		TextOut(hdc, 510, 190, s->players[0].strinDEX, lstrlen(s->players[0].strinDEX));
 
 		wsprintf(s->players[0].strinMental, "[dex:%d]", s->players[0].getMental());
-		TextOut(hdc, 610, 210, s->players[0].strinMental, lstrlen(s->players[0].strinMental));
+		TextOut(hdc, 510, 210, s->players[0].strinMental, lstrlen(s->players[0].strinMental));
 		//SetBkMode(bMemdc1, TRANSPARENT);
-		if (camaraPlayerX >= 300) 
-			camaraPlayerX = camaraPlayerX - (camaraPlayerX - 300);
-		if(camaraPlayerY >= 300)
-			camaraPlayerY = camaraPlayerY - (camaraPlayerY - 300);
+		if (camaraPlayerX >= 250) 
+			camaraPlayerX = camaraPlayerX - (camaraPlayerX - 250);
+		if(camaraPlayerY >= 250)
+			camaraPlayerY = camaraPlayerY - (camaraPlayerY - 250);
 	
 		if(walkPlayer==s->players[0].getState())
 			drawPlayer(bMemdc1, player, camaraPlayerX, camaraPlayerY,walkCount*40);
@@ -305,18 +368,28 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 			drawPlayer(bMemdc1, player, camaraPlayerX, camaraPlayerY, walkCount * 40);
 		if(attackPlayer==s->players[0].getState())
 			drawAttackPlayer(bMemdc1, attack, camaraPlayerX, camaraPlayerY);
+		if (fireSkill == s->players[0].getState()) {
+			drawEffect(bMemdc1, fireEffect, camaraPlayerX, camaraPlayerY);
+		}
 		else
 			drawPlayer(bMemdc1, player, camaraPlayerX, camaraPlayerY, walkCount * 40);
 		for (int p = 1; p < MAX_PLAYER; ++p)
 		{
 			if (true==s->players[p].getConnect())
 			{
+				wsprintf(s->players[p].strinHP, "[%d(%d):%d/%d]",s->players[p].getID(), s->players[p].getLevel(), 
+					s->players[p].getHp(),s->players[p].getMaxHP());
+				TextOut(bMemdc1, s->players[p].getPositionX() - screenX-30, s->players[p].getPositionY() - screenY-20,
+					s->players[p].strinHP, lstrlen(s->players[p].strinHP));
 				if(walkPlayer== s->players[p].getState())
 					drawPlayer(bMemdc1, player, s->players[p].getPositionX()- screenX, s->players[p].getPositionY()- screenY, walkCount*40);
 				if (waitPlayer == s->players[p].getState())
 					drawPlayer(bMemdc1, player, s->players[p].getPositionX() - screenX, s->players[p].getPositionY() - screenY, walkCount * 40);
 				if (attackPlayer == s->players[p].getState())
 					drawAttackPlayer(bMemdc1, attack, s->players[p].getPositionX() - screenX, s->players[p].getPositionY() - screenY);
+				if (fireSkill == s->players[p].getState()) {
+					drawEffect(bMemdc1, fireEffect, s->players[p].getPositionX() - screenX, s->players[p].getPositionY() - screenY);
+				}
 				else
 					drawPlayer(bMemdc1, player, s->players[p].getPositionX() - screenX, s->players[p].getPositionY() - screenY, walkCount * 40);
 			}
@@ -351,8 +424,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		//InvalidateRect(hwnd, NULL, true);
 		break;
 	case WM_PAINT:
-		globalX = 300;
-		globalY = 300;
 		hdc = BeginPaint(hwnd, &ps);
 		//for (int p = 0; p < MAX_PLAYER; ++p)
 		//{
@@ -382,7 +453,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		// hBit1에는 배경과 텍스트가 출력된 비트맵이 저장, mem1dc에 설정
 		oldBit1 = (HBITMAP)SelectObject(bMemdc1, bBitmap);
 		// mem1dc에 있는 내용을 hdc에 뿌려준다.
-		BitBlt(hdc, 0, 0,600,600, bMemdc1, 0, 0, SRCCOPY);
+		BitBlt(hdc, 0, 0,500,500, bMemdc1, 0, 0, SRCCOPY);
 		SelectObject(bMemdc1, oldBit1);
 		DeleteDC(bMemdc2);
 		//DeleteDC(bMemdc3);

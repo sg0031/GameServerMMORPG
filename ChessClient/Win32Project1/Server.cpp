@@ -14,6 +14,7 @@ Server::~Server()
 }
 int Server::socketinit(char* ip)
 {
+	chatLine = 0;
 	int count = 0;
 	for (auto i = OBJECT_START; i < MAX_OBJECT+ OBJECT_START; ++i)
 	{
@@ -130,8 +131,11 @@ void Server::KeyDownAttack(WPARAM key)
 	attack.packetSize = sizeof(CsPacketLogin);
 	if (key == 'A') {
 		attack.packetType = CS_ATTACK_A;
-		SendPacket(sock, &attack);
 	}
+	if (key == 'Q') {
+		attack.packetType = CS_FIRE_SKILL;
+	}
+	SendPacket(sock, &attack);
 }
 void Server::KeyDown(WPARAM wParam)
 {

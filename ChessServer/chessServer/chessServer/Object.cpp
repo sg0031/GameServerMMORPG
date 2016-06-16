@@ -59,12 +59,12 @@ void Rabbit::upDate()
 	{
 		if (false == attakcRange())
 			state = chaseState;
-		std::cout << getID() << "가 " << getTarget() << "을 공격중" << std::endl;
+		//std::cout << getID() << "가 " << getTarget() << "을 공격중" << std::endl;
 		break;
 	}
 	case deadState:
 	{
-		cout << getID() << "가 죽음" << endl;
+		//cout << getID() << "가 죽음" << endl;
 		break;
 	}
 
@@ -183,5 +183,5 @@ void Rabbit::randomMove()
 void Rabbit::decreaseHP(int ack)
 {
 	health -= ack;
-	cout << getID() << "몬스터 데미지 입음" << endl;
+	//cout << getID() << "몬스터 데미지 입음" << endl;
 }

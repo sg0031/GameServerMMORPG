@@ -14,6 +14,7 @@ class Server
 	int in_packet_size;
 	int save_packet_size;
 public:
+	int chatLine;
 	Object objects[MAX_OBJECT];
 	Player players[MAX_PLAYER];
 	static Server* getInstangce()

@@ -11,6 +11,7 @@ enum PlayerState
 {
 	waitPlayer = 300,
 	attackPlayer,
+	fireSkill,
 	walkPlayer,
 	deadPlayer
 };
@@ -55,6 +56,9 @@ class Player
 	int maxHealth;
 	int statusCount;
 public:
+	TCHAR viewChat[100];
+	TCHAR chat[100];
+	RECT rc;
 	TCHAR strinHP[100];
 	TCHAR strinMaxHP[100];
 	TCHAR strinAttack[10];

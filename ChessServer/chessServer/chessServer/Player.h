@@ -9,6 +9,7 @@ enum PlayerState
 {
 	waitPlayer = 300,
 	attackPlayer,
+	fireSkill,
 	walkPlayer,
 	deadPlayer
 };

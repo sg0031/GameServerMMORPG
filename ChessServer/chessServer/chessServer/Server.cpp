@@ -434,13 +434,10 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		login.position.x = players[id].getPositionX();
 		login.position.y = players[id].getPositionY();
 		sendPacket(id, &login);
-		sendPlayerStatus(id);
-
+		
 		updateSector(id);
 		viewListUpdate(id);
-
 		timer.AddGameEvent(playersHPincrease, id, 5000);
-
 		break;
 	}
 	case CS_RIGHT:
@@ -550,6 +547,28 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		sendPlayerStatus(id);
 		break;
 	}
+	case CS_FIRE_SKILL:
+	{
+		players[id].setState(fireSkill);
+		players[id].pLock.lock();
+		for (auto i : players[id].pObjectList) {
+			if (true == fireAttackCheck(id, i)) {
+				objects[i]->decreaseHP(players[id].getAttack());
+				if (deadState == objects[i]->getState()) {
+					players[id].increaseExp(objects[i]->getExp());
+					players[id].increaseGold(objects[i]->getGold());
+					_asm mfence;
+					objects[i]->setLevel(0);
+					if (true == players[id].levelUpcheck())
+						players[id].levelUp();
+				}
+
+			}
+		}
+		players[id].pLock.unlock();
+		sendPlayerStatus(id);
+		break;
+	}
 	case CS_STOP:
 	{
 		players[id].setState(waitPlayer);
@@ -570,7 +589,7 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 
 	updateSector(id);
 	viewListUpdate(id);
-
+	sendPlayerStatus(id);
 	players[id].pLock.lock();
 	for (auto i : players[id].pViewList)
 		sendPacket(i, &packet);
@@ -588,7 +607,27 @@ bool Server::attackCrushCheck(int player, int monster)
 		*(monPos.x - pPos.x)
 		+ (monPos.y - pPos.y)
 		* (monPos.y - pPos.y);
-	if (dist <= 5 * 5)
+	if (dist <= 20 * 20)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+bool Server::fireAttackCheck(int id, int Mon) {
+	D3DXVECTOR2 pPos;
+	D3DXVECTOR2 monPos;
+	pPos.x = players[id].getPositionX();
+	pPos.y = players[id].getPositionY();
+	monPos.x = objects[Mon]->getPosX();
+	monPos.y = objects[Mon]->getPosY();
+	float dist = (monPos.x - pPos.x)
+		*(monPos.x - pPos.x)
+		+ (monPos.y - pPos.y)
+		* (monPos.y - pPos.y);
+	if (dist <= 50 * 50)
 	{
 		return true;
 	}
@@ -887,6 +926,8 @@ void Server::sendPlayerStatus(int id) {
 	stat.statusCount = players[id].getStatusCount();
 	stat.exp = players[id].getExp();
 	sendPacket(id, &stat);
+	for (auto i : players[id].pViewList)
+		sendPacket(i, &stat);
 }
 void Server::sendPacket(int client, void* packet)
 {

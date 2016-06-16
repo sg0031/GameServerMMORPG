@@ -37,6 +37,11 @@ struct PlayerPosition
 
 //클라이언트에서 보내는 패킷에서는 아이디값이 필요가 없다
 //이유는 소켓으로 구분짓기 때문에 아이디값으로 구분을 줄 필요가 없다.
+struct CsPacketChat {
+	BYTE size;
+	BYTE type;
+	WCHAR message[100];
+};
 struct CsPacketLogin
 {
 	BYTE packetSize;
@@ -111,4 +116,10 @@ struct ScPacketRemovePlayer
 	BYTE packetSize;
 	BYTE packetType;
 	int id;
+};
+struct ScPacketChat {
+	BYTE size;
+	BYTE type;
+	int id;
+	WCHAR message[100];
 };
