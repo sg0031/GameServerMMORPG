@@ -38,6 +38,8 @@ struct PlayerPosition
 	int x;
 	int y;
 };
+#pragma pack (push, 1)
+
 struct CsPacketChat {
 	BYTE size;
 	BYTE type;
@@ -118,4 +120,13 @@ struct ScPacketChat {
 	int id;
 	WCHAR message[100];
 };
+struct ScPacketStateMessage {
+	BYTE size;
+	BYTE type;
+	int id;
+	int gold;
+	int exp;
+	int damage;
+};
 
+#pragma pack (pop)

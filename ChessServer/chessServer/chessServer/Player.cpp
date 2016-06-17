@@ -35,7 +35,7 @@ Player::Player()
 	overEx->operationType = Recvtype;
 	overEx->prevSize = 0;
 	overEx->currentSize = 0;
-	overEx->buf.buf = overEx->iocpBuf;
+	overEx->buf.buf = reinterpret_cast<CHAR*>(overEx->iocpBuf);
 	overEx->buf.len = sizeof(overEx->iocpBuf);
 	ZeroMemory(&overEx->overLapped, sizeof(overEx->overLapped));
 	for (auto i = 0; i < MAX_PLAYER; ++i)

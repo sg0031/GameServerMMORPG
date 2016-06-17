@@ -81,7 +81,7 @@ public:
 	int getPredSectorX() { return predSectorX; }
 	int getPredSectorY() { return predSectorY; }
 
-	void decreaseHP(int ack) { health -= ack; std::cout << id << "현재 HP :" << health << std::endl; }
+	void decreaseHP(int ack) { health -= ack; /*std::cout << id << "현재 HP :" << health << std::endl;*/ }
 	int getHp() { return health; }
 	//골드획득시 호출되는 메소드
 	void increaseGold(int gol) { gold += gol; }
@@ -95,21 +95,30 @@ public:
 	}
 	//스택선택시 상승 가능
 	void increaseMENTAL() { 
-		mental++;
-		attack = attack + (mental*0.5);
-		depend = depend + (mental*0.5);
-		statusCount--;
+		if (statusCount > 0) {
+			mental++;
+			attack = attack + (mental*0.5);
+			depend = depend + (mental*0.5);
+			maxAttack = attack;
+			maxDepend = depend;
+			statusCount--;
+		}
 	}
 	void increaseDEX() { 
-		dex++;
-		miss = miss + (dex * 1);
-		acr = acr + (dex * 1);
-		statusCount--;
+		if (statusCount > 0) {
+			dex++;
+			miss = miss + (dex * 1);
+			acr = acr + (dex * 1);
+			statusCount--;
+		}
 	}
 	void increaseSTR() { 
-		str++; 
-		attack = attack + (str * 2);
-		statusCount--;
+		if (statusCount > 0) {
+			str++;
+			attack = attack + (str * 2);
+			maxAttack = attack;
+			statusCount--;
+		}
 	}
 	//죽을을시에 호출 될 메소드
 	void resetPlayer() {

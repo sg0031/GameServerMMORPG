@@ -15,7 +15,7 @@ public:
 	~Server();
 	static void acceptThread();
 	static void workerThread();
-	static void processPacket(int id, char *ptr, double deltTime);
+	static void processPacket(int id,unsigned char *ptr, double deltTime);
 	static void sendPacket(int client, void* packet);
 	static void viewListUpdate(int id);
 	static void updateSector(int id);

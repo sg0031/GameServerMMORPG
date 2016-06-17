@@ -226,7 +226,7 @@ void Server::workerThread()
 		{
 			//cout << iosize << endl;
 			//cout << "Recvtype" << endl;
-			char *buf = over->iocpBuf;	//?
+			unsigned char *buf = over->iocpBuf;	//?
 			unsigned long dataToProcess = ioSize;
 			over->currentSize = dataToProcess;
 
@@ -289,7 +289,7 @@ void Server::workerThread()
 			objects[monID]->setState(waitState);
 			objects[monID]->setTarget(-1);
 			timer.AddGameEvent(MonsterUpdate, monID, 1000);
-			cout << monID << "부활" << endl;
+			//cout << monID << "부활" << endl;
 			delete over;
 		}
 		else if (over->operationType == playersHPincrease)
@@ -384,6 +384,13 @@ void Server::monsterProcessPacket(int id)
 		if(0!=players[objects[id]->getTarget()].pViewList.size())
 			for(auto i: players[objects[id]->getTarget()].pViewList)
 				sendPacket(i, &health);
+
+		ScPacketStateMessage meg;
+		meg.id = objects[id]->getTarget();
+		meg.size = sizeof(ScPacketStateMessage);
+		meg.type = SC_MONSTER_ATTACK_PLAYER;
+		meg.damage = objects[id]->getAttack();
+		sendPacket(objects[id]->getTarget(), &meg);
 	}
 	for (auto i : nearList)
 		sendPacket(i, &packet);
@@ -398,14 +405,14 @@ void Server::monsterProcessPacket(int id)
 			packet.state = objects[id]->getState();
 			for (auto i : nearList)
 				sendPacket(i, &packet);
-			timer.AddGameEvent(MonsterRespon, id, 10000);
+			timer.AddGameEvent(MonsterRespon, id, 30000);
 		}
 		else
-			timer.AddGameEvent(MonsterUpdate, id, 500);
+			timer.AddGameEvent(MonsterUpdate, id, 1000);
 	}
 	else if (true == nearList.empty()) objects[id]->setActive(false);
 }
-void Server::processPacket(int id, char *ptr, double deltaTime)
+void Server::processPacket(int id,unsigned char *ptr, double deltaTime)
 {
 	int crushCount = 0;
 	int listSize = players[id].pObjectList.size();
@@ -527,18 +534,32 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 	}
 	case CS_ATTACK_A:
 	{
+		ScPacketStateMessage meg;
+		meg.id = id;
+		meg.size = sizeof(ScPacketStateMessage);
 		players[id].setState(attackPlayer);
+
 		players[id].pLock.lock();
 		for (auto i : players[id].pObjectList) {
 			if (true == attackCrushCheck(id, i)) {
 				objects[i]->decreaseHP(players[id].getAttack());
+				meg.type = SC_HITDAMGE;
+				meg.damage = players[id].getAttack();
+				sendPacket(id, &meg);
 				if (deadState == objects[i]->getState()) {
 					players[id].increaseExp(objects[i]->getExp());
 					players[id].increaseGold(objects[i]->getGold());
+					meg.type = SC_MONSTER_DEAD;
+					meg.exp = objects[i]->getExp();
+					meg.gold = objects[i]->getGold();
+					sendPacket(id, &meg);
 					_asm mfence;
 					objects[i]->setLevel(0);
-					if (true == players[id].levelUpcheck())
+					if (true == players[id].levelUpcheck()) {
 						players[id].levelUp();
+						meg.type = SC_LEVEL_UP;
+						sendPacket(id, &meg);
+					}
 				}
 
 			}
@@ -549,18 +570,31 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 	}
 	case CS_FIRE_SKILL:
 	{
+		ScPacketStateMessage meg;
+		meg.id = id;
+		meg.size = sizeof(ScPacketStateMessage);
 		players[id].setState(fireSkill);
 		players[id].pLock.lock();
 		for (auto i : players[id].pObjectList) {
 			if (true == fireAttackCheck(id, i)) {
 				objects[i]->decreaseHP(players[id].getAttack());
+				meg.type = SC_HITDAMGE;
+				meg.damage = players[id].getAttack();
+				sendPacket(id, &meg);
 				if (deadState == objects[i]->getState()) {
 					players[id].increaseExp(objects[i]->getExp());
 					players[id].increaseGold(objects[i]->getGold());
+					meg.type = SC_MONSTER_DEAD;
+					meg.exp = objects[i]->getExp();
+					meg.gold = objects[i]->getGold();
+					sendPacket(id, &meg);
 					_asm mfence;
 					objects[i]->setLevel(0);
-					if (true == players[id].levelUpcheck())
+					if (true == players[id].levelUpcheck()) {
 						players[id].levelUp();
+						meg.type = SC_LEVEL_UP;
+						sendPacket(id, &meg);
+					}
 				}
 
 			}
@@ -574,7 +608,38 @@ void Server::processPacket(int id, char *ptr, double deltaTime)
 		players[id].setState(waitPlayer);
 		break;
 	}
-
+	case CS_CHAT:
+	{
+		CsPacketChat *chat = reinterpret_cast<CsPacketChat*>(ptr);
+		ScPacketChat meg;
+		meg.size = sizeof(ScPacketChat);
+		meg.type = SC_CHAT;
+		meg.id = id;
+		wcscpy(meg.message, chat->message);
+		//WideCharToMultiByte(CP_ACP, 0, chat->message, -1, (LPSTR)meg.message, 200, NULL, NULL);
+		//memcpy(&meg.message, &chat->message, sizeof(chat->message));
+		//sendPacket(id,&meg);
+		players[id].pLock.lock();
+		for (auto i : players[id].pViewList)
+			sendPacket(i, &meg);
+		players[id].pLock.unlock();
+		break;
+	}
+	case CS_MENTAL_UP:
+	{
+		players[id].increaseMENTAL();
+		break;
+	}
+	case CS_STR_UP:
+	{
+		players[id].increaseSTR();
+		break;
+	}
+	case CS_DEX_UP:
+	{
+		players[id].increaseDEX();
+		break;
+	}
 	}
 	//매번 플레이어들의 위치값 갱신
 	ScPacketMove packet;
@@ -937,16 +1002,16 @@ void Server::sendPacket(int client, void* packet)
 
 	Send_Operation->operationType = Sendtype;
 
-	Send_Operation->buf.buf = Send_Operation->packetBuf;
+	Send_Operation->buf.buf = reinterpret_cast<CHAR*>(Send_Operation->packetBuf);
 	Send_Operation->buf.len = packet_size;
 
-	memcpy(Send_Operation->packetBuf, reinterpret_cast<char*>(packet), packet_size);
+	memcpy(Send_Operation->packetBuf, reinterpret_cast<unsigned char*>(packet), packet_size);
 
 	DWORD iobyte;
 	DWORD sendFlag = 0;
 	int retval;
 	retval = WSASend(players[client].overEx->s, &Send_Operation->buf, 1,
-		&iobyte, sendFlag, &Send_Operation->overLapped, NULL);
+		NULL,0, &Send_Operation->overLapped, NULL);
 	if (retval != 0)
 	{
 		cout << GetLastError() << endl;

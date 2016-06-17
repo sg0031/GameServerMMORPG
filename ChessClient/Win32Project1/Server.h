@@ -15,6 +15,9 @@ class Server
 	int save_packet_size;
 public:
 	int chatLine;
+	WCHAR playerChat[100];
+	WCHAR chatWindow[6][100];//√§∆√√¢
+	WCHAR stateMessage[6][100];
 	Object objects[MAX_OBJECT];
 	Player players[MAX_PLAYER];
 	static Server* getInstangce()
@@ -23,7 +26,7 @@ public:
 		return &inst;
 	}
 	Server();
-	int socketinit(char *ip);
+	int socketinit(WCHAR *ip);
 	~Server();
 	GameBoard board[WIDTH][HEIGHT];
 	void setSocketHWND(HWND s) { socketHWND = s; }
@@ -34,6 +37,8 @@ public:
 	void ProcessPacket(char* buf);
 	void SendPacket(SOCKET s, void* buf);
 	void requsetState();
+	void SendMes(WCHAR *buf);
 	void KeyUp();
+	void statusUp();
 };
 

@@ -56,21 +56,21 @@ class Player
 	int maxHealth;
 	int statusCount;
 public:
-	TCHAR viewChat[100];
-	TCHAR chat[100];
+	WCHAR viewChat[100];
+	WCHAR chat[100];
 	RECT rc;
-	TCHAR strinHP[100];
-	TCHAR strinMaxHP[100];
-	TCHAR strinAttack[10];
-	TCHAR strinDepend[10];
-	TCHAR strinMiss[10];
-	TCHAR strinExp[10];
-	TCHAR strinSTR[10];
-	TCHAR strinDEX[10];
-	TCHAR strinMental[10];
-	TCHAR strinGold[10];
-	TCHAR strinAcr[10];
-	TCHAR strinLevel[100];
+	WCHAR strinHP[100];
+	WCHAR strinMaxHP[100];
+	WCHAR strinAttack[10];
+	WCHAR strinDepend[10];
+	WCHAR strinMiss[10];
+	WCHAR strinExp[10];
+	WCHAR strinSTR[10];
+	WCHAR strinDEX[10];
+	WCHAR strinMental[10];
+	WCHAR strinGold[10];
+	WCHAR strinAcr[10];
+	WCHAR strinLevel[100];
 
 	void setStatuCount(int st) { statusCount = st; }
 	int getStatusCount() { return statusCount; }

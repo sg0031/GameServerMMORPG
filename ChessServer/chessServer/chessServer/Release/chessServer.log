@@ -1,77 +1,4 @@
-﻿  stdafx.cpp
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(12): warning C4005: 'DXGI_STATUS_OCCLUDED': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50092): note: 'DXGI_STATUS_OCCLUDED'의 이전 정의를 참조하십시오.
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(13): warning C4005: 'DXGI_STATUS_CLIPPED': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50101): note: 'DXGI_STATUS_CLIPPED'의 이전 정의를 참조하십시오.
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(14): warning C4005: 'DXGI_STATUS_NO_REDIRECTION': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50110): note: 'DXGI_STATUS_NO_REDIRECTION'의 이전 정의를 참조하십시오.
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(15): warning C4005: 'DXGI_STATUS_NO_DESKTOP_ACCESS': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50119): note: 'DXGI_STATUS_NO_DESKTOP_ACCESS'의 이전 정의를 참조하십시오.
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(16): warning C4005: 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50128): note: 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE'의 이전 정의를 참조하십시오.
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(17): warning C4005: 'DXGI_STATUS_MODE_CHANGED': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50137): note: 'DXGI_STATUS_MODE_CHANGED'의 이전 정의를 참조하십시오.
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(18): warning C4005: 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50146): note: 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS'의 이전 정의를 참조하십시오.
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(21): warning C4005: 'DXGI_ERROR_INVALID_CALL': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50161): note: 'DXGI_ERROR_INVALID_CALL'의 이전 정의를 참조하십시오.
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(22): warning C4005: 'DXGI_ERROR_NOT_FOUND': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50170): note: 'DXGI_ERROR_NOT_FOUND'의 이전 정의를 참조하십시오.
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(23): warning C4005: 'DXGI_ERROR_MORE_DATA': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50179): note: 'DXGI_ERROR_MORE_DATA'의 이전 정의를 참조하십시오.
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(24): warning C4005: 'DXGI_ERROR_UNSUPPORTED': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50188): note: 'DXGI_ERROR_UNSUPPORTED'의 이전 정의를 참조하십시오.
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(25): warning C4005: 'DXGI_ERROR_DEVICE_REMOVED': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50197): note: 'DXGI_ERROR_DEVICE_REMOVED'의 이전 정의를 참조하십시오.
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(26): warning C4005: 'DXGI_ERROR_DEVICE_HUNG': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50206): note: 'DXGI_ERROR_DEVICE_HUNG'의 이전 정의를 참조하십시오.
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(27): warning C4005: 'DXGI_ERROR_DEVICE_RESET': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50216): note: 'DXGI_ERROR_DEVICE_RESET'의 이전 정의를 참조하십시오.
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(28): warning C4005: 'DXGI_ERROR_WAS_STILL_DRAWING': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50225): note: 'DXGI_ERROR_WAS_STILL_DRAWING'의 이전 정의를 참조하십시오.
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(29): warning C4005: 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50235): note: 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT'의 이전 정의를 참조하십시오.
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(30): warning C4005: 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50244): note: 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE'의 이전 정의를 참조하십시오.
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(31): warning C4005: 'DXGI_ERROR_DRIVER_INTERNAL_ERROR': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50254): note: 'DXGI_ERROR_DRIVER_INTERNAL_ERROR'의 이전 정의를 참조하십시오.
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(32): warning C4005: 'DXGI_ERROR_NONEXCLUSIVE': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50263): note: 'DXGI_ERROR_NONEXCLUSIVE'의 이전 정의를 참조하십시오.
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(33): warning C4005: 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50272): note: 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE'의 이전 정의를 참조하십시오.
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(34): warning C4005: 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50282): note: 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED'의 이전 정의를 참조하십시오.
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(35): warning C4005: 'DXGI_ERROR_REMOTE_OUTOFMEMORY': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50291): note: 'DXGI_ERROR_REMOTE_OUTOFMEMORY'의 이전 정의를 참조하십시오.
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(608): warning C4005: 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50445): note: 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'의 이전 정의를 참조하십시오.
-c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(609): warning C4005: 'D3D10_ERROR_FILE_NOT_FOUND': 매크로 재정의
-  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\winerror.h(50454): note: 'D3D10_ERROR_FILE_NOT_FOUND'의 이전 정의를 참조하십시오.
-d:\졸 업 작 품\servertermproject\gameservermmorpg\chessserver\chessserver\chessserver\Object.h(68): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-d:\졸 업 작 품\servertermproject\gameservermmorpg\chessserver\chessserver\chessserver\Object.h(77): warning C4800: 'int': 'true' 또는 'false'로 bool 값을 강제하고 있습니다(성능 경고).
-d:\졸 업 작 품\servertermproject\gameservermmorpg\chessserver\chessserver\chessserver\Player.h(99): warning C4244: '=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-d:\졸 업 작 품\servertermproject\gameservermmorpg\chessserver\chessserver\chessserver\Player.h(100): warning C4244: '=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-  GameBoard.cpp
-  Object.cpp
-Object.cpp(15): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Object.cpp(16): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Object.cpp(31): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Object.cpp(32): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Object.cpp(48): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Object.cpp(49): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Object.cpp(77): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Object.cpp(78): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Object.cpp(101): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Object.cpp(102): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Object.cpp(121): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Object.cpp(122): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Object.cpp(146): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Object.cpp(147): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Object.cpp(149): warning C4244: '인수': 'FLOAT'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Object.cpp(150): warning C4244: '인수': 'FLOAT'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-  Player.cpp
-  Sector.cpp
-  Server.cpp
+﻿  Server.cpp
 Server.cpp(28): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 Server.cpp(356): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 Server.cpp(357): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
@@ -95,25 +22,25 @@ Server.cpp(512): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서
 Server.cpp(513): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 Server.cpp(523): warning C4244: '인수': 'FLOAT'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 Server.cpp(524): warning C4244: '인수': 'FLOAT'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Server.cpp(602): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Server.cpp(603): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Server.cpp(604): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Server.cpp(605): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Server.cpp(622): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Server.cpp(623): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Server.cpp(624): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Server.cpp(625): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Server.cpp(643): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Server.cpp(644): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Server.cpp(645): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Server.cpp(646): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Server.cpp(675): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-Server.cpp(681): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-  TimerThread.cpp
-  chessServer.cpp
+Server.cpp(585): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\corecrt_wstring.h(121): note: 'wcscpy' 선언을 참조하십시오.
+Server.cpp(618): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+Server.cpp(619): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+Server.cpp(620): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+Server.cpp(621): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+Server.cpp(638): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+Server.cpp(639): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+Server.cpp(640): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+Server.cpp(641): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+Server.cpp(659): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+Server.cpp(660): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+Server.cpp(661): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+Server.cpp(662): warning C4244: '=': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+Server.cpp(691): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+Server.cpp(697): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
   코드를 생성하고 있습니다.
-  0 of 1014 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+  1 of 1014 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    7 functions had inline decision re-evaluated but remain unchanged
+    1 functions had inline decision re-evaluated but remain unchanged
   코드를 생성했습니다.
-  chessServer.vcxproj -> D:\졸 업 작 품\serverTermProject\GameServerMMORPG\ChessServer\chessServer\Release\chessServer.exe
+  chessServer.vcxproj -> E:\GameServerMMORPG\GameServerMMORPG\ChessServer\chessServer\Release\chessServer.exe

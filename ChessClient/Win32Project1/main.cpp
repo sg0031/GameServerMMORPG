@@ -131,10 +131,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	WndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
 	WndClass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
 	WndClass.lpszMenuName = NULL;
-	WndClass.lpszClassName = "Window Class Name";
+	WndClass.lpszClassName = L"Window Class Name";
 	RegisterClass(&WndClass);
-	hwnd = CreateWindow("Window Class Name",
-		"Window Title Name",
+	hwnd = CreateWindow(L"Window Class Name",
+		L"Window Title Name",
 		WS_OVERLAPPEDWINDOW,
 		0,
 		0,
@@ -173,17 +173,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 	static HBITMAP chessPiece,skyMap,oldBit1,oldBit2,oldBit3;
 	static HBITMAP stone,baby,rabbit,argo,babyguard;
 	static HBITMAP player, attack, fireAttack, fireEffect;
-	static TCHAR ip[10];
-	static TCHAR pos[100];
-	static TCHAR debuff[100];
-	static TCHAR buff[100];
-	static TCHAR chatWindow[6][100];//채팅창
+	static WCHAR ip[10];
+	static WCHAR pos[100];
+	static WCHAR debuff[100];
+	static WCHAR buff[100];
 	static int chatLine, chatCount;
-	static TCHAR myChatString[100];//내가 입력하는 글씨
-	static TCHAR myViewString[100];
+	static WCHAR myChatString[100];//내가 입력하는 글씨
+	static WCHAR myViewString[100];
 	static int myCharCount;
 	static int count;
 	static int printLine;
+	static float attacktime;
 	int camaraPlayerX;
 	int camaraPlayerY;
 	int screenX;
@@ -210,6 +210,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		break;
 	}
 	case WM_CREATE:
+		attacktime = 0.0;
 		printLine = 1;
 		chatLine = 0;
 		chatCount = 0;
@@ -255,14 +256,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 				myChatString[myCharCount] = NULL;
 			}
 			else if (wParam == VK_RETURN) {
-				ZeroMemory(&chatWindow[s->chatLine],100);
-				wsprintf(myViewString, TEXT("%d : %s"), s->players[0].getID(), myChatString);
-				memcpy(&chatWindow[s->chatLine], &myViewString, sizeof(myViewString));
+				for (int i = 5; i > 0; --i) {
+					memcpy(&s->chatWindow[i], &s->chatWindow[i-1], 100);
+				}
+				ZeroMemory(&s->chatWindow[0],100);
+				wsprintf(myViewString, L"%d : %s", s->players[0].getID(), myChatString);
+				s->SendMes(myViewString);
+				memcpy(&s->chatWindow[0], &myViewString, sizeof(myViewString));
 				chatEnterFlag = false;
-				if (s->chatLine >= 5)
-					s->chatLine = 0;
-				else
-					s->chatLine++;
 				myCharCount = 0;
 				ZeroMemory(&myChatString, sizeof(myChatString));
 			}
@@ -287,9 +288,19 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		}
 		if(wParam==VK_LEFT || wParam==VK_RIGHT || wParam==VK_UP || wParam==VK_DOWN)
 			s->KeyDown(wParam);
-		if (wParam == 'A' && chatEnterFlag==false)
-			s->KeyDownAttack(wParam);
+		if (wParam == 'A' && chatEnterFlag == false) {
+			if (attacktime < GetTickCount()) {
+				attacktime = GetTickCount()+1000;
+				s->KeyDownAttack(wParam);
+			}
+		}
 		if (wParam == 'Q'&& chatEnterFlag==false)
+			s->KeyDownAttack(wParam);
+		if (wParam == 'I'&& chatEnterFlag == false)
+			s->KeyDownAttack(wParam);
+		if (wParam == 'O'&& chatEnterFlag == false)
+			s->KeyDownAttack(wParam);
+		if (wParam == 'P'&& chatEnterFlag == false)
 			s->KeyDownAttack(wParam);
 		break;
 	case WM_KEYUP:
@@ -318,43 +329,44 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		BitBlt(bMemdc1, 0, 0, 500, 500, bMemdc2, screenX, screenY, SRCCOPY);
 		for (auto i = 5; i >=0; --i)
 		{
-			TextOut(hdc, 10, 510+ (printLine*20), chatWindow[i], lstrlen(chatWindow[i]));
+			TextOut(hdc, 10, 510+(printLine*20), s->chatWindow[i], lstrlen(s->chatWindow[i]));
+			TextOut(hdc, 510, 510 + (printLine * 20), s->stateMessage[i], lstrlen(s->stateMessage[i]));
 			printLine++;
 		}
 		printLine = 1;
 		TextOut(hdc, 10,510, myChatString, lstrlen(myChatString));
 		TextOut(hdc, 510, 10, ip, lstrlen(ip));
-		wsprintf(pos, TEXT("player pos[ %d, %d ]"), s->players[0].getPositionX(), s->players[0].getPositionY());
+		wsprintf(pos, L"player pos[ %d, %d ]", s->players[0].getPositionX(), s->players[0].getPositionY());
 		TextOut(hdc, 510, 30, pos, lstrlen(pos));
 		if(attackDown==s->players[0].getDebuff())
-			wsprintf(debuff, "Debuff[Attack 10% Down]");
+			wsprintf(debuff, L"Debuff[Attack 10% Down]");
 		if (dependDown == s->players[0].getDebuff())
-			wsprintf(debuff, "Debuff[Depend 10% Down]");
+			wsprintf(debuff, L"Debuff[Depend 10% Down]");
 		if (noBuff == s->players[0].getDebuff())
-			wsprintf(debuff, "Debuff[No DeBuff]");
+			wsprintf(debuff, L"Debuff[No DeBuff]");
 		TextOut(hdc, 510, 50, debuff, lstrlen(debuff));
 		if (noBuff == s->players[0].getDebuff())
-			wsprintf(buff, "Debuff[No Buff]");
+			wsprintf(buff, L"Debuff[No Buff]");
 		TextOut(hdc, 510, 70, buff, lstrlen(buff));
-		wsprintf(s->players[0].strinHP, "[Player HP : %d/%d]", s->players[0].getHp(),s->players[0].getMaxHP());
+		wsprintf(s->players[0].strinHP, L"[Player HP : %d/%d]", s->players[0].getHp(),s->players[0].getMaxHP());
 		TextOut(hdc, 510, 90, s->players[0].strinHP, lstrlen(s->players[0].strinHP));
 		
-		wsprintf(s->players[0].strinLevel, "[level:%d statusCount:%d]", s->players[0].getLevel(), s->players[0].getStatusCount());
+		wsprintf(s->players[0].strinLevel, L"[level:%d statusCount:%d]", s->players[0].getLevel(), s->players[0].getStatusCount());
 		TextOut(hdc, 510, 110, s->players[0].strinLevel, lstrlen(s->players[0].strinLevel));
 
-		wsprintf(s->players[0].strinAttack, "[attack:%d depend:%d]", s->players[0].getAttack(), s->players[0].getDepend());
+		wsprintf(s->players[0].strinAttack, L"[attack:%d depend:%d]", s->players[0].getAttack(), s->players[0].getDepend());
 		TextOut(hdc, 510, 130, s->players[0].strinAttack, lstrlen(s->players[0].strinAttack));
 
-		wsprintf(s->players[0].strinExp, "[exp:%d gold:%d]", s->players[0].getExp(), s->players[0].getGold());
+		wsprintf(s->players[0].strinExp, L"[exp:%d gold:%d]", s->players[0].getExp(), s->players[0].getGold());
 		TextOut(hdc, 510, 150, s->players[0].strinExp, lstrlen(s->players[0].strinExp));
 
-		wsprintf(s->players[0].strinSTR, "[str:%d]", s->players[0].getStr());
+		wsprintf(s->players[0].strinSTR, L"[str:%d]", s->players[0].getStr());
 		TextOut(hdc, 510, 170, s->players[0].strinSTR, lstrlen(s->players[0].strinSTR));
 
-		wsprintf(s->players[0].strinDEX, "[dex:%d]", s->players[0].getDex());
+		wsprintf(s->players[0].strinDEX, L"[dex:%d]", s->players[0].getDex());
 		TextOut(hdc, 510, 190, s->players[0].strinDEX, lstrlen(s->players[0].strinDEX));
 
-		wsprintf(s->players[0].strinMental, "[dex:%d]", s->players[0].getMental());
+		wsprintf(s->players[0].strinMental, L"[mental:%d]", s->players[0].getMental());
 		TextOut(hdc, 510, 210, s->players[0].strinMental, lstrlen(s->players[0].strinMental));
 		//SetBkMode(bMemdc1, TRANSPARENT);
 		if (camaraPlayerX >= 250) 
@@ -377,7 +389,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		{
 			if (true==s->players[p].getConnect())
 			{
-				wsprintf(s->players[p].strinHP, "[%d(%d):%d/%d]",s->players[p].getID(), s->players[p].getLevel(), 
+				wsprintf(s->players[p].strinHP, L"[%d(%d):%d/%d]",s->players[p].getID(), s->players[p].getLevel(), 
 					s->players[p].getHp(),s->players[p].getMaxHP());
 				TextOut(bMemdc1, s->players[p].getPositionX() - screenX-30, s->players[p].getPositionY() - screenY-20,
 					s->players[p].strinHP, lstrlen(s->players[p].strinHP));

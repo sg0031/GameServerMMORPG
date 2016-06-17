@@ -12,7 +12,7 @@ Server::~Server()
 {
 
 }
-int Server::socketinit(char* ip)
+int Server::socketinit(WCHAR* ip)
 {
 	chatLine = 0;
 	int count = 0;
@@ -80,7 +80,7 @@ void Server::ReadPacket()
 		cout << "Recv Error : " << err_code << endl;
 	}
 	//cout << "recv" << endl;
-	char *ptr = reinterpret_cast<char*>(Recv_buf);
+	BYTE *ptr = reinterpret_cast<BYTE*>(Recv_buf);
 
 	while (0 != iobyte)
 	{
@@ -111,6 +111,22 @@ void Server::ReadPacket()
 
 	}
 }
+void Server::SendMes(WCHAR *buf) {
+	CsPacketChat meg;
+	meg.type = CS_CHAT;
+	meg.size = sizeof(CsPacketChat);
+	//size_t len = strlen(buf) + 1;
+	//size_t wlen;
+	//wchar_t wmess[100];
+	//len = (100 - 1 < len) ? 100 - 1 : len;
+	//mbstowcs_s(&wlen, wmess, len, buf, _TRUNCATE);
+	//wmess[100 - 1] = (wchar_t)0;
+	//wcscpy(meg.message, wmess);
+	//MultiByteToWideChar(CP_ACP, 0, buf, -1, meg.message, sizeof(meg.message));
+	memcpy(&meg.message, buf, sizeof(meg.message));
+	SendPacket(sock, &meg);
+	//SendPacket(sock, buf);
+}
 void Server::requsetState()
 {
 	CsPacketLogin requset;
@@ -134,6 +150,15 @@ void Server::KeyDownAttack(WPARAM key)
 	}
 	if (key == 'Q') {
 		attack.packetType = CS_FIRE_SKILL;
+	}
+	if (key == 'I') {
+		attack.packetType = CS_STR_UP;
+	}
+	if (key == 'O') {
+		attack.packetType = CS_DEX_UP;
+	}
+	if (key == 'P') {
+		attack.packetType = CS_MENTAL_UP;
 	}
 	SendPacket(sock, &attack);
 }
@@ -355,6 +380,62 @@ void Server::ProcessPacket(char* buf)
 				break;
 			}
 		}
+		break;
+	}
+	case SC_CHAT:
+	{
+		ScPacketChat *chat = reinterpret_cast<ScPacketChat*>(buf);
+		//WideCharToMultiByte(CP_ACP, 0, chat->message, -1, chatWindow[chatLine], 100, NULL, NULL);
+		for (int i = 5; i > 0; --i) {
+			memcpy(&chatWindow[i], &chatWindow[i - 1], 100);
+		}
+		ZeroMemory(&chatWindow[0], 100);
+		memcpy(&chatWindow[0], &chat->message, sizeof(chat->message));
+		//if (chatLine >= 5)
+		//	chatLine = 0;
+		//else
+		//	chatLine++;
+
+		break;
+	}
+	case SC_MONSTER_ATTACK_PLAYER:
+	{
+		ScPacketStateMessage *meg = reinterpret_cast<ScPacketStateMessage*>(buf);
+		for (int i = 5; i > 0; --i) {
+			memcpy(&stateMessage[i], &stateMessage[i - 1], 100);
+		}
+		ZeroMemory(&stateMessage[0], 100);
+		wsprintf(stateMessage[0], L"몬스터가 %d의 데미지를 입혔습니다.", meg->damage);
+		break;
+	}
+	case SC_HITDAMGE:
+	{
+		ScPacketStateMessage *meg = reinterpret_cast<ScPacketStateMessage*>(buf);
+		for (int i = 5; i > 0; --i) {
+			memcpy(&stateMessage[i], &stateMessage[i - 1], 100);
+		}
+		ZeroMemory(&stateMessage[0], 100);
+		wsprintf(stateMessage[0], L"몬스터에게 %d의 데미지를 입혔습니다.", meg->damage);
+		break;
+	}
+	case SC_MONSTER_DEAD:
+	{
+		ScPacketStateMessage *meg = reinterpret_cast<ScPacketStateMessage*>(buf);
+		for (int i = 5; i > 0; --i) {
+			memcpy(&stateMessage[i], &stateMessage[i - 1], 100);
+		}
+		ZeroMemory(&stateMessage[0], 100);
+		wsprintf(stateMessage[0], L"%d경험치와 %d골드를 획득했습니다.", meg->exp,meg->gold);
+		break;
+	}
+	case SC_LEVEL_UP:
+	{
+		ScPacketStateMessage *meg = reinterpret_cast<ScPacketStateMessage*>(buf);
+		for (int i = 5; i > 0; --i) {
+			memcpy(&stateMessage[i], &stateMessage[i - 1], 100);
+		}
+		ZeroMemory(&stateMessage[0], 100);
+		wsprintf(stateMessage[0], L"레벨이 올랐습니다.");
 		break;
 	}
 	//스위치케이스문 끝나는 부분
