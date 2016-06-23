@@ -173,7 +173,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 	static HBITMAP chessPiece,skyMap,oldBit1,oldBit2,oldBit3;
 	static HBITMAP stone,baby,rabbit,argo,babyguard;
 	static HBITMAP player, attack, fireAttack, fireEffect;
-	static WCHAR ip[10];
+	static WCHAR ip[100];
 	static WCHAR pos[100];
 	static WCHAR debuff[100];
 	static WCHAR buff[100];
@@ -184,6 +184,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 	static int count;
 	static int printLine;
 	static float attacktime;
+	static float skillTime;
 	int camaraPlayerX;
 	int camaraPlayerY;
 	int screenX;
@@ -210,6 +211,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		break;
 	}
 	case WM_CREATE:
+		skillTime = 0.0;
 		attacktime = 0.0;
 		printLine = 1;
 		chatLine = 0;
@@ -239,7 +241,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 		frameCount = 0;
 		walkCount = 0;
 		effectCount = 0;
-		SetTimer(hwnd, 1, 14,NULL);
+		SetTimer(hwnd, 1, 50,NULL);
 		ZeroMemory(&ip, sizeof(ip));
 		break;
 	case WM_CHAR:
@@ -294,8 +296,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,
 				s->KeyDownAttack(wParam);
 			}
 		}
-		if (wParam == 'Q'&& chatEnterFlag==false)
-			s->KeyDownAttack(wParam);
+		if (wParam == 'Q'&& chatEnterFlag == false) {
+			if (skillTime < GetTickCount()) {
+				skillTime = GetTickCount() + 5000;
+				s->KeyDownAttack(wParam);
+			}
+		}
 		if (wParam == 'I'&& chatEnterFlag == false)
 			s->KeyDownAttack(wParam);
 		if (wParam == 'O'&& chatEnterFlag == false)

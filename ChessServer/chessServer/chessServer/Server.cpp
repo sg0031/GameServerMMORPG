@@ -390,6 +390,7 @@ void Server::monsterProcessPacket(int id)
 		meg.size = sizeof(ScPacketStateMessage);
 		meg.type = SC_MONSTER_ATTACK_PLAYER;
 		meg.damage = objects[id]->getAttack();
+		meg.monsterId = id;
 		sendPacket(objects[id]->getTarget(), &meg);
 	}
 	for (auto i : nearList)
@@ -534,6 +535,8 @@ void Server::processPacket(int id,unsigned char *ptr, double deltaTime)
 	}
 	case CS_ATTACK_A:
 	{
+		unordered_set<int> dead;
+		unordered_set<int> hit;
 		ScPacketStateMessage meg;
 		meg.id = id;
 		meg.size = sizeof(ScPacketStateMessage);
@@ -541,20 +544,17 @@ void Server::processPacket(int id,unsigned char *ptr, double deltaTime)
 
 		players[id].pLock.lock();
 		for (auto i : players[id].pObjectList) {
+			if (deadState == objects[i]->getState())continue;
 			if (true == attackCrushCheck(id, i)) {
 				objects[i]->decreaseHP(players[id].getAttack());
-				meg.type = SC_HITDAMGE;
-				meg.damage = players[id].getAttack();
-				sendPacket(id, &meg);
-				if (deadState == objects[i]->getState()) {
+				hit.insert(i);	
+				//_asm mfence;
+				if (0>= objects[i]->getHP()) {
 					players[id].increaseExp(objects[i]->getExp());
 					players[id].increaseGold(objects[i]->getGold());
-					meg.type = SC_MONSTER_DEAD;
-					meg.exp = objects[i]->getExp();
-					meg.gold = objects[i]->getGold();
-					sendPacket(id, &meg);
-					_asm mfence;
-					objects[i]->setLevel(0);
+					dead.insert(i);
+					//_asm mfence;
+					
 					if (true == players[id].levelUpcheck()) {
 						players[id].levelUp();
 						meg.type = SC_LEVEL_UP;
@@ -565,31 +565,52 @@ void Server::processPacket(int id,unsigned char *ptr, double deltaTime)
 			}
 		}
 		players[id].pLock.unlock();
+
+		ScPacketStateMessage sendmeg;
+		sendmeg.id = id;
+		sendmeg.size = sizeof(ScPacketStateMessage);
+		for (auto i : hit) {
+			sendmeg.type = SC_HITDAMGE;
+			sendmeg.damage = players[id].getAttack();
+			sendmeg.monsterId = i;
+			sendPacket(id, &sendmeg);
+		}
+
+		for (auto i : dead) {
+			sendmeg.type = SC_MONSTER_DEAD;
+			sendmeg.exp = objects[i]->getExp();
+			sendmeg.gold = objects[i]->getGold();
+			sendmeg.monsterId = i;
+			//objects[i]->setLevel(0);
+			sendPacket(id, &sendmeg);
+		}
+
+
 		sendPlayerStatus(id);
 		break;
 	}
 	case CS_FIRE_SKILL:
 	{
+		unordered_set<int> dead;
+		unordered_set<int> hit;
 		ScPacketStateMessage meg;
 		meg.id = id;
 		meg.size = sizeof(ScPacketStateMessage);
 		players[id].setState(fireSkill);
+
 		players[id].pLock.lock();
 		for (auto i : players[id].pObjectList) {
+			if (deadState == objects[i]->getState())continue;
 			if (true == fireAttackCheck(id, i)) {
 				objects[i]->decreaseHP(players[id].getAttack());
-				meg.type = SC_HITDAMGE;
-				meg.damage = players[id].getAttack();
-				sendPacket(id, &meg);
-				if (deadState == objects[i]->getState()) {
+				hit.insert(i);
+				_asm mfence;
+				if (0>= objects[i]->getHP()) {
 					players[id].increaseExp(objects[i]->getExp());
 					players[id].increaseGold(objects[i]->getGold());
-					meg.type = SC_MONSTER_DEAD;
-					meg.exp = objects[i]->getExp();
-					meg.gold = objects[i]->getGold();
-					sendPacket(id, &meg);
+					dead.insert(i);
 					_asm mfence;
-					objects[i]->setLevel(0);
+					//objects[i]->setLevel(0);
 					if (true == players[id].levelUpcheck()) {
 						players[id].levelUp();
 						meg.type = SC_LEVEL_UP;
@@ -600,6 +621,24 @@ void Server::processPacket(int id,unsigned char *ptr, double deltaTime)
 			}
 		}
 		players[id].pLock.unlock();
+
+		ScPacketStateMessage sendmeg;
+		sendmeg.id = id;
+		sendmeg.size = sizeof(ScPacketStateMessage);
+		for (auto i : hit) {
+			sendmeg.type = SC_HITDAMGE;
+			sendmeg.damage = players[id].getAttack();
+			sendmeg.monsterId = i;
+			sendPacket(id, &sendmeg);
+		}
+
+		for (auto i : dead) {
+			sendmeg.type = SC_MONSTER_DEAD;
+			sendmeg.exp = objects[i]->getExp();
+			sendmeg.gold = objects[i]->getGold();
+			sendmeg.monsterId = i;
+			sendPacket(id, &sendmeg);
+		}
 		sendPlayerStatus(id);
 		break;
 	}

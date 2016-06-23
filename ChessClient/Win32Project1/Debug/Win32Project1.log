@@ -1,7 +1,4 @@
-﻿  main.cpp
-e:\gameservermmorpg\gameservermmorpg\chessclient\win32project1\main.cpp(293): warning C4244: '=': 'DWORD'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-e:\gameservermmorpg\gameservermmorpg\chessclient\win32project1\main.cpp(171): warning C4101: 'oldBrushBlack' :참조되지 않은 지역 변수입니다.
-e:\gameservermmorpg\gameservermmorpg\chessclient\win32project1\main.cpp(170): warning C4101: 'oldBrush' :참조되지 않은 지역 변수입니다.
-e:\gameservermmorpg\gameservermmorpg\chessclient\win32project1\main.cpp(171): warning C4101: 'hBrushBlack' :참조되지 않은 지역 변수입니다.
-e:\gameservermmorpg\gameservermmorpg\chessclient\win32project1\main.cpp(170): warning C4101: 'hBrush' :참조되지 않은 지역 변수입니다.
-  Win32Project1.vcxproj -> E:\GameServerMMORPG\GameServerMMORPG\ChessClient\Debug\Win32Project1.exe
+﻿  Server.cpp
+d:\졸 업 작 품\servertermproject\gameservermmorpg\chessclient\win32project1\server.cpp(92): warning C4018: '>=': signed 또는 unsigned가 일치하지 않습니다.
+d:\졸 업 작 품\servertermproject\gameservermmorpg\chessclient\win32project1\server.cpp(168): warning C4101: 'iobyte' :참조되지 않은 지역 변수입니다.
+  Win32Project1.vcxproj -> D:\졸 업 작 품\serverTermProject\GameServerMMORPG\ChessClient\Debug\Win32Project1.exe

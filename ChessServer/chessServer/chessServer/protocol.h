@@ -52,7 +52,6 @@ struct CsPacketMove
 {
 	BYTE packetSize;
 	BYTE packetType;
-	int id;
 };
 struct CsPacketAttack //플레이어가 공격버튼을 눌렀을때 보내는 패킷이다.
 {
@@ -130,5 +129,6 @@ struct ScPacketStateMessage {
 	int gold;
 	int exp;
 	int damage;
+	int monsterId;
 };
 #pragma pack (pop)

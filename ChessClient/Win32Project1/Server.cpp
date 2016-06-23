@@ -405,7 +405,7 @@ void Server::ProcessPacket(char* buf)
 			memcpy(&stateMessage[i], &stateMessage[i - 1], 100);
 		}
 		ZeroMemory(&stateMessage[0], 100);
-		wsprintf(stateMessage[0], L"몬스터가 %d의 데미지를 입혔습니다.", meg->damage);
+		wsprintf(stateMessage[0], L"몬스터%d가 %d의 데미지를 입혔습니다.",meg->monsterId,meg->damage);
 		break;
 	}
 	case SC_HITDAMGE:
@@ -415,7 +415,7 @@ void Server::ProcessPacket(char* buf)
 			memcpy(&stateMessage[i], &stateMessage[i - 1], 100);
 		}
 		ZeroMemory(&stateMessage[0], 100);
-		wsprintf(stateMessage[0], L"몬스터에게 %d의 데미지를 입혔습니다.", meg->damage);
+		wsprintf(stateMessage[0], L"몬스터%d에게 %d의 데미지를 입혔습니다.", meg->monsterId,meg->damage);
 		break;
 	}
 	case SC_MONSTER_DEAD:
@@ -425,7 +425,7 @@ void Server::ProcessPacket(char* buf)
 			memcpy(&stateMessage[i], &stateMessage[i - 1], 100);
 		}
 		ZeroMemory(&stateMessage[0], 100);
-		wsprintf(stateMessage[0], L"%d경험치와 %d골드를 획득했습니다.", meg->exp,meg->gold);
+		wsprintf(stateMessage[0], L"몬스터%d가 죽고%d경험치와 %d골드를 획득했습니다.", meg->monsterId,meg->exp,meg->gold);
 		break;
 	}
 	case SC_LEVEL_UP:

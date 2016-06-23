@@ -64,6 +64,7 @@ void Rabbit::upDate()
 	}
 	case deadState:
 	{
+		level = 0;
 		//cout << getID() << "°¡ Á×À½" << endl;
 		break;
 	}
@@ -81,7 +82,7 @@ bool Rabbit::attakcRange()
 		*(targetPos.x - monPos.x)
 		+ (targetPos.y - monPos.y)
 		* (targetPos.y - monPos.y);
-	if (dist <= 5 * 5)
+	if (dist <= 20 * 20)
 	{
 		return true;
 	}
@@ -105,7 +106,7 @@ bool Rabbit::hitDamge()
 		*(targetPos.x - monPos.x)
 		+ (targetPos.y - monPos.y)
 		* (targetPos.y - monPos.y);
-	if (dist <= 5 * 5)
+	if (dist <= 20 * 20)
 	{
 		return true;
 	}
@@ -125,7 +126,7 @@ bool Rabbit::chaseRange()
 		*(targetPos.x - monPos.x)
 		+ (targetPos.y - monPos.y)
 		* (targetPos.y - monPos.y);
-	if (dist <= 20 * 20)
+	if (dist <= 50 * 50)
 	{
 		dir = targetPos - monPos;
 		D3DXVec2Normalize(&dir, &dir);

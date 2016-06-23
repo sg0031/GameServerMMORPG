@@ -55,7 +55,6 @@ struct CsPacketMove
 {
 	BYTE packetSize;
 	BYTE packetType;
-	int id;
 };
 
 struct ScPacketBuff
@@ -127,6 +126,7 @@ struct ScPacketStateMessage {
 	int gold;
 	int exp;
 	int damage;
+	int monsterId;
 };
 
 #pragma pack (pop)
